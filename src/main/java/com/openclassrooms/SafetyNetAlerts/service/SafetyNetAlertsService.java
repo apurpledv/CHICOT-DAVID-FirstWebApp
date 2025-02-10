@@ -62,12 +62,12 @@ public class SafetyNetAlertsService {
 		repo.deleteFireStationFromList(station);
 	}
 	
-	/*public String getMedicalRecordsAsJSONString() {
+	public String getMedicalRecordsAsJSONString() {
 		return repo.getMedicalRecordsAsJSONString();
 	}
 	
 	public void addMedicalRecord(MedicalRecord record) {
-		repo.addMedicalRecordIntoList(station);
+		repo.addMedicalRecordIntoList(record);
 	}
 	
 	public void modifyMedicalRecord(MedicalRecord record) {
@@ -76,7 +76,7 @@ public class SafetyNetAlertsService {
 	
 	public void deleteMedicalRecord(MedicalRecord record) {
 		repo.deleteMedicalRecordFromList(record);
-	}*/
+	}
 	
 }
 

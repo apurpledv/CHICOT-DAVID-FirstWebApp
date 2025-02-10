@@ -155,4 +155,33 @@ public class SafetyNetAlertsRepository {
 			}
 		}
 	}
+	
+	public String getMedicalRecordsAsJSONString() {
+		String ListString = Arrays.toString(RecordList.toArray());
+		return ListString;
+	}
+	
+	public void addMedicalRecordIntoList(MedicalRecord record) {
+		RecordList.add(record);
+	}
+	
+	public void modifyMedicalRecordInList(MedicalRecord recordToChange) {
+		for (MedicalRecord record : RecordList) {
+		    if (recordToChange.getFirstName().equals(record.getFirstName()) && recordToChange.getLastName().equals(record.getLastName())) {
+		    	record.setBirthdate(recordToChange.getBirthdate());
+		    	record.setMedications(recordToChange.getMedications());
+		    	record.setAllergies(recordToChange.getAllergies());
+		    	break;
+		    }
+		}
+	}
+	
+	public void deleteMedicalRecordFromList(MedicalRecord recordToDelete) {
+		for (MedicalRecord record : RecordList) {
+			if (recordToDelete.getFirstName().equals(record.getFirstName()) && recordToDelete.getLastName().equals(record.getLastName())) {
+				RecordList.remove(record);
+				break;
+			}
+		}
+	}
 }

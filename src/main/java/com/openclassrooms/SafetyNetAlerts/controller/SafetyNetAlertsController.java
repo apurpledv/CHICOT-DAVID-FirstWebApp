@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
+import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 import com.openclassrooms.SafetyNetAlerts.service.SafetyNetAlertsService;
 
@@ -88,6 +89,31 @@ public class SafetyNetAlertsController {
 	@DeleteMapping("/firestation")
 	public ResponseEntity<HttpStatus> deleteFireStation(@RequestBody FireStation station) {
 		service.deleteFireStation(station);
+		return ResponseEntity.ok(HttpStatus.OK);
+	}
+
+	// MAPPING OF: '/medicalRecord'
+	
+	@GetMapping("/medicalRecord")
+	public ResponseEntity<String> getMedicalRecords() {
+		return new ResponseEntity<>(service.getMedicalRecordsAsJSONString(), HttpStatus.OK);
+	}
+	
+	@PostMapping("/medicalRecord")
+	public ResponseEntity<HttpStatus> addMedicalRecord(@RequestBody MedicalRecord record) {
+		service.addMedicalRecord(record);
+		return ResponseEntity.ok(HttpStatus.OK);
+	}
+	
+	@PutMapping("/medicalRecord")
+	public ResponseEntity<HttpStatus> modifyMedicalRecord(@RequestBody MedicalRecord record) {
+		service.modifyMedicalRecord(record);
+		return ResponseEntity.ok(HttpStatus.OK);
+	}
+	
+	@DeleteMapping("/medicalRecord")
+	public ResponseEntity<HttpStatus> deleteMedicalRecord(@RequestBody MedicalRecord record) {
+		service.deleteMedicalRecord(record);
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 }
