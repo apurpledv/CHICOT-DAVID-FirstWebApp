@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.openclassrooms.SafetyNetAlerts.repository.SafetyNetAlertsRepository;
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
+import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 
 import lombok.Data;
@@ -29,10 +30,6 @@ public class SafetyNetAlertsService {
 		return repo.getPerson(firstName, lastName);
 	}
 	
-	public String getPersonsAsString() {
-		return repo.getPersonsAsString();
-	}
-	
 	public String getPersonsAsJSONString() {
 		return repo.getPersonsAsJSONString();
 	}
@@ -49,24 +46,36 @@ public class SafetyNetAlertsService {
 		repo.deletePersonFromList(firstName, lastName);
 	}
 
-	public Person getFireStation(String firstName, String lastName) {
-		return repo.getPerson(firstName, lastName);
-	}
-	
-	/*public String getFireStationsAsJSONString() {
-		return repo.getPersonsAsJSONString();
+	public String getFireStationsAsJSONString() {
+		return repo.getFireStationsAsJSONString();
 	}
 	
 	public void addFireStation(FireStation station) {
 		repo.addFireStationIntoList(station);
 	}
 	
-	public void modifyPerson(FireStation station) {
+	public void modifyFireStation(FireStation station) {
 		repo.modifyFireStationInList(station);
 	}
 	
 	public void deleteFireStation(FireStation station) {
 		repo.deleteFireStationFromList(station);
+	}
+	
+	/*public String getMedicalRecordsAsJSONString() {
+		return repo.getMedicalRecordsAsJSONString();
+	}
+	
+	public void addMedicalRecord(MedicalRecord record) {
+		repo.addMedicalRecordIntoList(station);
+	}
+	
+	public void modifyMedicalRecord(MedicalRecord record) {
+		repo.modifyMedicalRecordInList(record);
+	}
+	
+	public void deleteMedicalRecord(MedicalRecord record) {
+		repo.deleteMedicalRecordFromList(record);
 	}*/
 	
 }

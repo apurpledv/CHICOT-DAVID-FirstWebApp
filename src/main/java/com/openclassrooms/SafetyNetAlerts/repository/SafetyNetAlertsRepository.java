@@ -129,38 +129,30 @@ public class SafetyNetAlertsRepository {
 		}
 	}
 	
-	/*public String getFireStationsAsJSONString() {
+	public String getFireStationsAsJSONString() {
 		String ListString = Arrays.toString(FireStationList.toArray());
-		return PersonsListString;
+		return ListString;
 	}
 	
-	public void addPersonIntoList(Person person) {
-		PersonsList.add(person);
+	public void addFireStationIntoList(FireStation station) {
+		FireStationList.add(station);
 	}
 	
-	public void modifyPersonInList(Person personToChange) {
-		for (Person person : PersonsList) {
-		    if (personToChange.getFirstName().equals(person.getFirstName()) && personToChange.getLastName().equals(person.getLastName())) {
-		    	person.setAddress(personToChange.getAddress());
-		    	person.setCity(personToChange.getCity());
-		    	person.setZip(personToChange.getZip());
-		    	person.setPhone(personToChange.getPhone());
-		    	person.setEmail(personToChange.getEmail());
+	public void modifyFireStationInList(FireStation stationToChange) {
+		for (FireStation station : FireStationList) {
+		    if (stationToChange.getAddress().equals(station.getAddress())) {
+		    	station.setStation(stationToChange.getStation());
 		    	break;
 		    }
 		}
 	}
 	
-	public void deletePersonFromList(String firstName, String lastName) {
-		for (Person person : PersonsList) {
-		    if (person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)) {
-		    	PersonsList.remove(person);
-		    	break;
-		    }
+	public void deleteFireStationFromList(FireStation stationToDelete) {
+		for (FireStation station : FireStationList) {
+			if (stationToDelete.getAddress().equals(station.getAddress()) && stationToDelete.getStation().equals(station.getStation())) {
+				FireStationList.remove(station);
+				break;
+			}
 		}
-	}*/
-	
-	
-	
-	
+	}
 }

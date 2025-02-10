@@ -33,11 +33,6 @@ public class SafetyNetAlertsController {
 		// code here
     }
 	
-	/*@GetMapping("/person")
-	public ResponseEntity<String> getPersons() {
-		return new ResponseEntity<>(service.getPersonsAsString(), HttpStatus.OK);
-	}*/
-	
 	// MAPPING OF: '/person'
 	
 	@GetMapping("/person")
@@ -71,7 +66,7 @@ public class SafetyNetAlertsController {
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 	
-	/*// MAPPING OF: '/firestation'
+	// MAPPING OF: '/firestation'
 	
 	@GetMapping("/firestation")
 	public ResponseEntity<String> getFireStations() {
@@ -94,5 +89,5 @@ public class SafetyNetAlertsController {
 	public ResponseEntity<HttpStatus> deleteFireStation(@RequestBody FireStation station) {
 		service.deleteFireStation(station);
 		return ResponseEntity.ok(HttpStatus.OK);
-	}*/
+	}
 }
