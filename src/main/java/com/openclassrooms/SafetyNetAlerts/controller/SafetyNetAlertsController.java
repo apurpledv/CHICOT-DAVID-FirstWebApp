@@ -2,6 +2,7 @@ package com.openclassrooms.SafetyNetAlerts.controller;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
 import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
+import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromAddressDTO;
 import com.openclassrooms.SafetyNetAlerts.service.SafetyNetAlertsService;
 
 @Controller
@@ -42,28 +44,20 @@ public class SafetyNetAlertsController {
 	}
 	
 	@PostMapping("/person")
-	public ResponseEntity<String> addPerson(@RequestBody Person person) {
-		System.out.println("Adding '" + person.getFirstName() + " " + person.getLastName() + "' into the list.");
-
+	public ResponseEntity<HttpStatus> addPerson(@RequestBody Person person) {
 		service.addPerson(person);
-		
-		return new ResponseEntity<>("'" + person.getFirstName() + " " + person.getLastName() + "' was successfully added.", HttpStatus.OK);
+		return ResponseEntity.ok(HttpStatus.OK);
 	}
 	
 	@PutMapping("/person")
-	public ResponseEntity<String> modifyPerson(@RequestBody Person person) {
+	public ResponseEntity<HttpStatus> modifyPerson(@RequestBody Person person) {
 		service.modifyPerson(person);
-		
-		String ResponseText = "'" + person.getFirstName() + " " + person.getLastName() + "' was successfully modified.";
-		return new ResponseEntity<>(ResponseText, HttpStatus.OK);
+		return ResponseEntity.ok(HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/person")
 	public ResponseEntity<HttpStatus> deletePerson(@RequestBody Person person) {
-		System.out.println("Deleting '" + person.getFirstName() + " " + person.getLastName() + "'.");
-
 		service.deletePerson(person.getFirstName(), person.getLastName());
-		
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 	
@@ -116,4 +110,17 @@ public class SafetyNetAlertsController {
 		service.deleteMedicalRecord(record);
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
+	
+	// URLS
+	@GetMapping("/fire")
+	public ResponseEntity<Person> getPersonDataFromAddress(@RequestParam String address) {
+		//return new ResponseEntity<>(service.getPersonDataFromAddress(address), HttpStatus.OK);
+		return new ResponseEntity<>(new Person(), HttpStatus.OK);
+	}
+	
+	@GetMapping("/communityEmail")
+	public ResponseEntity<String> getCommunityEmail(@RequestParam String city) {
+		return new ResponseEntity<>(service.getPersonsEmailFromCity(city), HttpStatus.OK);
+	}
+	
 }

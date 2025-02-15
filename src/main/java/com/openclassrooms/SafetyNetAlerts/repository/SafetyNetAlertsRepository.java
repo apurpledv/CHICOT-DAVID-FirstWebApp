@@ -2,6 +2,9 @@ package com.openclassrooms.SafetyNetAlerts.repository;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalTime;
+import java.time.Period;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,21 +17,27 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
+import com.openclassrooms.SafetyNetAlerts.model.Mapper;
 import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
+import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromAddressDTO;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class SafetyNetAlertsRepository {
+	@Autowired
+	Mapper DTOmapper;
+	
 	private String fileName = "src/main/resources/data.json";
 	private JsonNode FullJSONData;
 
 	private ObjectMapper mapper = new ObjectMapper();
 	
-	private Boolean init = false;
-	
-	private List<Person> PersonsList = null;
-	private List<FireStation> FireStationList = null;
-	private List<MedicalRecord> RecordList = null;
+	private List<Person> PersonsList = new ArrayList<Person>();
+	private List<FireStation> FireStationList = new ArrayList<FireStation>();
+	private List<MedicalRecord> RecordList = new ArrayList<MedicalRecord>();
 	
 	public SafetyNetAlertsRepository() {
 		initRepo();
@@ -45,13 +54,11 @@ public class SafetyNetAlertsRepository {
 			// Use ObjectMapper to get the JSON as exploitable data
 			FullJSONData = mapper.readTree(JsonFromFile);
 		} catch (Exception e) {
-			System.out.println("Error: Cannot open requested file.");
+			log.error("Cannot open requested file.");
 		}
 	}
 	
-	public void initRepo() {
-		if (init) return;
-		
+	private void initRepo() {
 		// Get JSON from the file as exploitable data
 		getJSONFromFile();
 		
@@ -61,12 +68,9 @@ public class SafetyNetAlertsRepository {
 			FireStationList = mapper.readValue(mapper.writeValueAsString(FullJSONData.path("firestations")), new TypeReference<List<FireStation>>(){});
 			RecordList = mapper.readValue(mapper.writeValueAsString(FullJSONData.path("medicalrecords")), new TypeReference<List<MedicalRecord>>(){});
 		} catch (JsonProcessingException e) {
-			System.out.println("Error: Cannot load JSON data.");
+			log.error("Cannot load JSON data.");
 		}
-		
-		System.out.println("File loaded successfully.");
-		
-		init = true;
+		log.info("File loaded successfully.");
 	}
 	
 	public Person getPerson(String firstName, String lastName) {
@@ -161,6 +165,17 @@ public class SafetyNetAlertsRepository {
 		return ListString;
 	}
 	
+	public MedicalRecord getMedicalRecord(String firstName, String lastName) {
+		MedicalRecord recordFound = null;
+		for (MedicalRecord record : RecordList) {
+		    if (record.getFirstName().equals(firstName) && record.getLastName().equals(lastName)) {
+		    	recordFound = record;
+		    	break;
+		    }
+		}
+		return recordFound;
+	}
+	
 	public void addMedicalRecordIntoList(MedicalRecord record) {
 		RecordList.add(record);
 	}
@@ -183,5 +198,28 @@ public class SafetyNetAlertsRepository {
 				break;
 			}
 		}
+	}
+	
+	public String getPersonsEmailFromCity(String cityName) {
+		List<String> ListOfPersonsFromCity = new ArrayList<String>();
+		for (Person person : PersonsList) {
+		    if (person.getCity().equals(cityName))
+		    	ListOfPersonsFromCity.add(person.getEmail());
+		}
+		
+		String ListString = Arrays.toString(ListOfPersonsFromCity.toArray());
+		return ListString;
+	}
+	
+	public String getPersonDataFromAddress(String address) {
+		List<PersonDataFromAddressDTO> ListDTO = new ArrayList<PersonDataFromAddressDTO>();
+		for (Person person : PersonsList) {
+		    if (person.getAddress().equals(address)) {
+		    	ListDTO.add(DTOmapper.toDTO(address, person, getMedicalRecord(person.getFirstName(), person.getLastName())));
+		    }
+		}
+		
+		String ListString = Arrays.toString(ListDTO.toArray());
+		return ListString;
 	}
 }

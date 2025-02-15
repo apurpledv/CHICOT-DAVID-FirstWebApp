@@ -18,10 +18,6 @@ public class SafetyNetAlertsService {
 	@Autowired
 	private SafetyNetAlertsRepository repo;
 	
-	public void initRepository() {
-		repo.initRepo();
-	}
-
 	public List<Person> getPersons() {
 		return repo.getPersonsList();
 	}
@@ -76,6 +72,14 @@ public class SafetyNetAlertsService {
 	
 	public void deleteMedicalRecord(MedicalRecord record) {
 		repo.deleteMedicalRecordFromList(record);
+	}
+	
+	public String getPersonsEmailFromCity(String cityName) {
+		return repo.getPersonsEmailFromCity(cityName);
+	}
+	
+	public String getPersonDataFromAddress(String address) {
+		return repo.getPersonDataFromAddress(address);
 	}
 	
 }
