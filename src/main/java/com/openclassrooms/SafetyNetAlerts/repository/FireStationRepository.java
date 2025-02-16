@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,16 +13,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
-import com.openclassrooms.SafetyNetAlerts.model.Mapper;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class FireStationRepository {
-	@Autowired
-	Mapper DTOmapper;
-	
 	private String fileName = "src/main/resources/data.json";
 	private JsonNode FullJSONData;
 
@@ -87,5 +82,15 @@ public class FireStationRepository {
 				break;
 			}
 		}
+	}
+	
+	public String getFireStationNumberFromAddress(String address) {
+		String stationNumber = "-1";
+		for (FireStation station : FireStationList) {
+			if (station.getAddress().equals(address)) {
+				stationNumber = station.getStation();
+			}
+		}
+		return stationNumber; 
 	}
 }

@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 import com.openclassrooms.SafetyNetAlerts.service.PersonService;
 
@@ -47,19 +49,8 @@ public class PersonController {
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 	
-	// URLS
-	
-	// [WIP]
-	
-	/*@GetMapping("/fire")
-	public ResponseEntity<Person> getPersonDataFromAddress(@RequestParam String address) {
-		//return new ResponseEntity<>(service.getPersonDataFromAddress(address), HttpStatus.OK);
-		return new ResponseEntity<>(new Person(), HttpStatus.OK);
-	}
-	
 	@GetMapping("/communityEmail")
-	public ResponseEntity<String> getCommunityEmail(@RequestParam String city) {
-		return new ResponseEntity<>(service.getPersonsEmailFromCity(city), HttpStatus.OK);
-	}*/
-	
+	public ResponseEntity<List<String>> getCommunityEmail(@RequestParam String city) {
+		return new ResponseEntity<>(service.getPersonEmailsFromCity(city), HttpStatus.OK);
+	}
 }

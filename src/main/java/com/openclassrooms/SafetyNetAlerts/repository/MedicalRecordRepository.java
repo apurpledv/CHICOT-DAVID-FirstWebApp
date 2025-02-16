@@ -6,14 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.openclassrooms.SafetyNetAlerts.model.Mapper;
 import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class MedicalRecordRepository {
-	@Autowired
-	Mapper DTOmapper;
-	
 	private String fileName = "src/main/resources/data.json";
 	private JsonNode FullJSONData;
 

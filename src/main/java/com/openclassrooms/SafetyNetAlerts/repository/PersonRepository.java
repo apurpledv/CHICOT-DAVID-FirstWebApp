@@ -6,14 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.openclassrooms.SafetyNetAlerts.model.Mapper;
+import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class PersonRepository {
-	@Autowired
-	Mapper DTOmapper;
-	
 	private String fileName = "src/main/resources/data.json";
 	private JsonNode FullJSONData;
 
@@ -57,6 +53,17 @@ public class PersonRepository {
 		// Use it to create Java Objects
 		try {
 			PersonsList = mapper.readValue(mapper.writeValueAsString(FullJSONData.path("persons")), new TypeReference<List<Person>>(){});
+			
+			// We assign each person their respective Medical Record (if found)
+			List<MedicalRecord> RecordsListTemp = mapper.readValue(mapper.writeValueAsString(FullJSONData.path("medicalrecords")), new TypeReference<List<MedicalRecord>>(){});
+			for (Person person : PersonsList) {
+				for (MedicalRecord record : RecordsListTemp) {
+				    if (person.getFirstName().equals(record.getFirstName()) && person.getLastName().equals(record.getLastName())) {
+				    	person.setRecord(record);
+				    	break;
+				    }
+				}
+			}
 		} catch (JsonProcessingException e) {
 			log.error("Cannot load JSON data.");
 		}
@@ -104,7 +111,7 @@ public class PersonRepository {
 		}
 	}
 	
-	/*public List<String> getPersonsEmailFromCity(String cityName) {
+	public List<String> getPersonEmailsFromCity(String cityName) {
 		List<String> ListOfPersonsFromCity = new ArrayList<String>();
 		for (Person person : PersonsList) {
 		    if (person.getCity().equals(cityName))
@@ -112,6 +119,8 @@ public class PersonRepository {
 		}
 		return ListOfPersonsFromCity;
 	}
+	
+	/*
 	
 	public String getPersonDataFromAddress(String address) {
 		List<PersonDataFromAddressDTO> ListDTO = new ArrayList<PersonDataFromAddressDTO>();

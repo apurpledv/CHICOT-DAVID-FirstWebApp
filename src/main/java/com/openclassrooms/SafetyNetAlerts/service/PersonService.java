@@ -36,9 +36,11 @@ public class PersonService {
 		repo.deletePerson(firstName, lastName);
 	}
 	
-	/*public String getPersonsEmailFromCity(String cityName) {
-		return repo.getPersonsEmailFromCity(cityName);
+	public List<String> getPersonEmailsFromCity(String cityName) {
+		return repo.getPersonEmailsFromCity(cityName);
 	}
+	
+	/*
 	
 	public String getPersonDataFromAddress(String address) {
 		return repo.getPersonDataFromAddress(address);
