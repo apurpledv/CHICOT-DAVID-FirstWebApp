@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.openclassrooms.SafetyNetAlerts.repository.FireStationRepository;
 import com.openclassrooms.SafetyNetAlerts.repository.PersonRepository;
+import com.openclassrooms.SafetyNetAlerts.util.SNAUtil;
+import com.openclassrooms.SafetyNetAlerts.model.ChildDataFromAddressDTO;
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
 import com.openclassrooms.SafetyNetAlerts.model.Mapper;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
@@ -82,5 +84,32 @@ public class PersonService {
 		return ListDTO;
 	}
 	
+	public List<ChildDataFromAddressDTO> getChildrenFromAddress(String address) {
+		List<ChildDataFromAddressDTO> ListDTO = new ArrayList<ChildDataFromAddressDTO>();
+		
+		List<Person> personsList = PersonRepo.getPersons();
+		
+		for (Person person : personsList) {
+			if (SNAUtil.getAge(person.getRecord().getBirthdate()) > 18)
+				continue;
+			
+		    if (!person.getAddress().equals(address))
+		    	continue;
+		    
+		    List<Person> otherMembers = PersonRepo.getPersonsFromAddress(address);
+		    
+		    // We make sure we don't have that person in the "Other Members" list
+		    for (Person otherMember : otherMembers) {
+		    	if (person.getFirstName().equals(otherMember.getFirstName()) && person.getLastName().equals(otherMember.getLastName())) {
+		    		otherMembers.remove(otherMember);
+		    		break;
+		    	}
+		    }
+		    
+		    ListDTO.add(DTOmapper.toDTO(person, otherMembers));
+		}
+		
+		return ListDTO;
+	}
 }
 

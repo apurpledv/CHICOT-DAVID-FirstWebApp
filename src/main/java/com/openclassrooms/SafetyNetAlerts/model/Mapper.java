@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.openclassrooms.SafetyNetAlerts.util.SNAUtil;
+
 import lombok.Data;
 
 @Component
@@ -18,7 +20,7 @@ public class Mapper {
 		MedicalRecord record = person.getRecord();
 		
 		// Get Age from Birthdate
-		String age = String.valueOf(Period.between(LocalDate.parse(record.getBirthdate(), DateTimeFormatter.ofPattern("MM/dd/yyyy")), LocalDate.now()).getYears());
+		String age = String.valueOf(SNAUtil.getAge(record.getBirthdate()));
 		
 		List<String> medication = record.getMedications();
 		List<String> allergies = record.getAllergies();
@@ -32,12 +34,23 @@ public class Mapper {
 		MedicalRecord record = person.getRecord();
 		
 		// Get Age from Birthdate
-		String age = String.valueOf(Period.between(LocalDate.parse(record.getBirthdate(), DateTimeFormatter.ofPattern("MM/dd/yyyy")), LocalDate.now()).getYears());
-
+		String age = String.valueOf(SNAUtil.getAge(record.getBirthdate()));
+		
 		String email = person.getEmail();
 		List<String> medication = record.getMedications();
 		List<String> allergies = record.getAllergies();
 		
 		return new PersonDataFromLastNameDTO(lastName, address, age, email, medication, allergies);
+	}
+	
+	public ChildDataFromAddressDTO toDTO(Person person, List<Person> otherMembers) {
+		String firstName = person.getFirstName();
+		String lastName = person.getLastName();
+		MedicalRecord record = person.getRecord();
+		
+		// Get Age from Birthdate
+		String age = String.valueOf(SNAUtil.getAge(record.getBirthdate()));
+		
+		return new ChildDataFromAddressDTO(firstName, lastName, age, otherMembers);
 	}
 }

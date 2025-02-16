@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.openclassrooms.SafetyNetAlerts.model.ChildDataFromAddressDTO;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromLastNameDTO;
 import com.openclassrooms.SafetyNetAlerts.service.PersonService;
@@ -48,6 +49,11 @@ public class PersonController {
 	public ResponseEntity<HttpStatus> deletePerson(@RequestBody Person person) {
 		service.deletePerson(person.getFirstName(), person.getLastName());
 		return ResponseEntity.ok(HttpStatus.OK);
+	}
+	
+	@GetMapping("/childAlert")
+	public ResponseEntity<List<ChildDataFromAddressDTO>> getChildrenFromAddress(@RequestParam String address) {
+		return new ResponseEntity<>(service.getChildrenFromAddress(address), HttpStatus.OK);
 	}
 	
 	@GetMapping("/phoneAlert")
