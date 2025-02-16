@@ -49,6 +49,11 @@ public class PersonController {
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 	
+	@GetMapping("/phoneAlert")
+	public ResponseEntity<List<String>> getPhonesFromStationNumber(@RequestParam String firestation) {
+		return new ResponseEntity<>(service.getPhonesFromStationNumber(firestation), HttpStatus.OK);
+	}
+	
 	@GetMapping("/communityEmail")
 	public ResponseEntity<List<String>> getCommunityEmail(@RequestParam String city) {
 		return new ResponseEntity<>(service.getPersonEmailsFromCity(city), HttpStatus.OK);

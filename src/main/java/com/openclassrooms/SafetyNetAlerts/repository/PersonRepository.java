@@ -120,6 +120,15 @@ public class PersonRepository {
 		return ListOfPersonsFromCity;
 	}
 	
+	public List<Person> getPersonsFromAddress(String address) {
+		List<Person> ListOfPersonsFromAddress = new ArrayList<Person>();
+		for (Person person : PersonsList) {
+		    if (person.getAddress().equals(address))
+		    	ListOfPersonsFromAddress.add(person);
+		}
+		return ListOfPersonsFromAddress;
+	}
+	
 	/*
 	
 	public String getPersonDataFromAddress(String address) {
