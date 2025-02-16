@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 import com.openclassrooms.SafetyNetAlerts.repository.FireStationRepository;
 import com.openclassrooms.SafetyNetAlerts.repository.PersonRepository;
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
+import com.openclassrooms.SafetyNetAlerts.model.Mapper;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
+import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromAddressDTO;
+import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromLastNameDTO;
 
 import lombok.Data;
 
@@ -21,6 +24,9 @@ public class PersonService {
 	
 	@Autowired
 	private FireStationRepository FireRepo;
+	
+	@Autowired
+	Mapper DTOmapper;
 	
 	public List<Person> getPersons() {
 		return PersonRepo.getPersons();
@@ -60,6 +66,20 @@ public class PersonService {
 		}
 		
 		return PhonesList;
+	}
+	
+	public List<PersonDataFromLastNameDTO> getPersonInfo(String lastName) {
+		List<PersonDataFromLastNameDTO> ListDTO = new ArrayList<PersonDataFromLastNameDTO>();
+		
+		List<Person> personsList = PersonRepo.getPersons();
+		
+		for (Person person : personsList) {
+		    if (person.getLastName().equals(lastName)) {
+		    	ListDTO.add(DTOmapper.toDTO(person));
+		    }
+		}
+		
+		return ListDTO;
 	}
 	
 }

@@ -51,7 +51,7 @@ public class FireStationService {
 		
 		for (Person person : personsList) {
 		    if (person.getAddress().equals(address)) {
-		    	ListDTO.add(DTOmapper.toDTO(address, person, person.getRecord(), stationNumber));
+		    	ListDTO.add(DTOmapper.toDTO(person, stationNumber));
 		    }
 		}
 		

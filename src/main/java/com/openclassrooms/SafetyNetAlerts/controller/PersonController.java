@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.openclassrooms.SafetyNetAlerts.model.Person;
+import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromLastNameDTO;
 import com.openclassrooms.SafetyNetAlerts.service.PersonService;
 
 @Controller
@@ -52,6 +53,11 @@ public class PersonController {
 	@GetMapping("/phoneAlert")
 	public ResponseEntity<List<String>> getPhonesFromStationNumber(@RequestParam String firestation) {
 		return new ResponseEntity<>(service.getPhonesFromStationNumber(firestation), HttpStatus.OK);
+	}
+	
+	@GetMapping("/personInfo")
+	public ResponseEntity<List<PersonDataFromLastNameDTO>> getPersonInfo(@RequestParam String lastName) {
+		return new ResponseEntity<>(service.getPersonInfo(lastName), HttpStatus.OK);
 	}
 	
 	@GetMapping("/communityEmail")
