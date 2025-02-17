@@ -64,11 +64,10 @@ public class Mapper {
 	public PersonFromStationNumberDTO toPersonFromStationDto(Person person) {
 		String firstName = person.getFirstName();
 		String lastName = person.getLastName();
+		String address = person.getAddress();
 		String phone = person.getPhone();
-		MedicalRecord record = person.getRecord();
-		String age = String.valueOf(SNAUtil.getAge(record.getBirthdate()));
 		
-		return new PersonFromStationNumberDTO(firstName, lastName, phone, age);
+		return new PersonFromStationNumberDTO(firstName, lastName, address, phone);
 	}
 	
 	public PersonsDataFromStationDTO toPersonsDataFromStationNumberDto(String adults, String children, List<PersonFromStationNumberDTO> persons) {

@@ -6,13 +6,13 @@ import lombok.Data;
 public class PersonFromStationNumberDTO {
 	private String firstName;
 	private String lastName;
+	private String address;
 	private String phone;
-	private String age;
 	
-	public PersonFromStationNumberDTO(String firstName, String lastName, String phone, String age) {
+	public PersonFromStationNumberDTO(String firstName, String lastName, String address, String phone) {
 		this.firstName = firstName;
 		this.lastName = lastName;
+		this.address = address;
 		this.phone = phone;
-		this.age = age;
 	}
 }
