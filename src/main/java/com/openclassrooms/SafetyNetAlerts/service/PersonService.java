@@ -13,7 +13,6 @@ import com.openclassrooms.SafetyNetAlerts.model.ChildDataFromAddressDTO;
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
 import com.openclassrooms.SafetyNetAlerts.model.Mapper;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
-import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromAddressDTO;
 import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromLastNameDTO;
 
 import lombok.Data;
@@ -77,7 +76,7 @@ public class PersonService {
 		
 		for (Person person : personsList) {
 		    if (person.getLastName().equals(lastName)) {
-		    	ListDTO.add(DTOmapper.toDTO(person));
+		    	ListDTO.add(DTOmapper.toPersonDataFromLastNameDto(person));
 		    }
 		}
 		
@@ -106,7 +105,7 @@ public class PersonService {
 		    	}
 		    }
 		    
-		    ListDTO.add(DTOmapper.toDTO(person, otherMembers));
+		    ListDTO.add(DTOmapper.toChildDataFromAddressDto(person, otherMembers));
 		}
 		
 		return ListDTO;

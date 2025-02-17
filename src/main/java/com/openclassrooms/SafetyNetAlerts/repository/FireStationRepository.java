@@ -93,4 +93,14 @@ public class FireStationRepository {
 		}
 		return stationNumber; 
 	}
+	
+	public List<String> getFireStationAddressesFromStationNumber(String stationNumber) {
+		List<String> ListOfStationAddresses = new ArrayList<String>();
+		for (FireStation station : FireStationList) {
+			if (station.getStation().equals(stationNumber)) {
+				ListOfStationAddresses.add(station.getAddress());
+			}
+		}
+		return ListOfStationAddresses; 
+	}
 }

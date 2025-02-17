@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
+import com.openclassrooms.SafetyNetAlerts.model.HouseholdFromStationsDTO;
 import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromAddressDTO;
 import com.openclassrooms.SafetyNetAlerts.service.FireStationService;
 
@@ -49,5 +50,11 @@ public class FireStationController {
 	public ResponseEntity<List<PersonDataFromAddressDTO>> getPersonDTOFromAddress(@RequestParam String address) {
 		//return new ResponseEntity<>(service.getPersonDataFromAddress(address), HttpStatus.OK);
 		return new ResponseEntity<>(service.getPersonDTOFromAddress(address), HttpStatus.OK);
+	}
+	
+	@GetMapping("/flood/station")
+	public ResponseEntity<List<HouseholdFromStationsDTO>> getHouseholdDTOFromStations(@RequestParam List<String> stations) {
+		//return new ResponseEntity<>(service.getPersonDataFromAddress(address), HttpStatus.OK);
+		return new ResponseEntity<>(service.getHouseholdDTOFromStations(stations), HttpStatus.OK);
 	}
 }
