@@ -89,7 +89,7 @@ public class PersonService {
 		List<Person> personsList = PersonRepo.getPersons();
 		
 		for (Person person : personsList) {
-			if (SNAUtil.getAge(person.getRecord().getBirthdate()) > 18)
+			if (SNAUtil.getAge(person.getRecord().getBirthdate()) > SNAUtil.MAJORITY_AGE)
 				continue;
 			
 		    if (!person.getAddress().equals(address))

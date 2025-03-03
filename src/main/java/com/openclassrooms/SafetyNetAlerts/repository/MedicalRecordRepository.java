@@ -88,9 +88,9 @@ public class MedicalRecordRepository {
 		}
 	}
 	
-	public void deleteMedicalRecord(MedicalRecord recordToDelete) {
+	public void deleteMedicalRecord(String recordFirstName, String recordLastName) {
 		for (MedicalRecord record : RecordList) {
-			if (recordToDelete.getFirstName().equals(record.getFirstName()) && recordToDelete.getLastName().equals(record.getLastName())) {
+			if (record.getFirstName().equals(recordFirstName) && record.getLastName().equals(recordLastName)) {
 				RecordList.remove(record);
 				break;
 			}

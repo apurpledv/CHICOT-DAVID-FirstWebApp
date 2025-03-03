@@ -5,6 +5,8 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
 public class SNAUtil {
+	public static final int MAJORITY_AGE = 18;
+	
 	public static int getAge(LocalDate dateFrom, LocalDate dateTo) {
 		return (Period.between(dateFrom, dateTo).getYears());
 	}

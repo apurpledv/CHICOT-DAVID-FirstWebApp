@@ -75,9 +75,9 @@ public class FireStationRepository {
 		}
 	}
 	
-	public void deleteFireStation(FireStation stationToDelete) {
+	public void deleteFireStation(String address, String stationNumber) {
 		for (FireStation station : FireStationList) {
-			if (stationToDelete.getAddress().equals(station.getAddress()) && stationToDelete.getStation().equals(station.getStation())) {
+			if (station.getAddress().equals(address) && station.getStation().equals(stationNumber)) {
 				FireStationList.remove(station);
 				break;
 			}

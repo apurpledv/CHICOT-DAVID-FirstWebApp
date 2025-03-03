@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.service.MedicalRecordService;
@@ -38,8 +39,8 @@ public class MedicalRecordController {
 	}
 	
 	@DeleteMapping("/medicalRecord")
-	public ResponseEntity<HttpStatus> deleteMedicalRecord(@RequestBody MedicalRecord record) {
-		service.deleteMedicalRecord(record);
+	public ResponseEntity<HttpStatus> deleteMedicalRecord(@RequestParam String recordFirstName, @RequestParam String recordLastName) {
+		service.deleteMedicalRecord(recordFirstName, recordLastName);
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 }

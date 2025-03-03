@@ -44,8 +44,8 @@ public class FireStationService {
 		FireRepo.modifyFireStation(station);
 	}
 	
-	public void deleteFireStation(FireStation station) {
-		FireRepo.deleteFireStation(station);
+	public void deleteFireStation(String address, String station) {
+		FireRepo.deleteFireStation(address, station);
 	}
 	
 	public List<PersonDataFromAddressDTO> getPersonDTOFromAddress(String address) {

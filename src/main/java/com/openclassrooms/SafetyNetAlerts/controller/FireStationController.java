@@ -24,11 +24,6 @@ public class FireStationController {
 	@Autowired
 	FireStationService service;
 	
-	/*@GetMapping("/firestation")
-	public ResponseEntity<List<FireStation>> getFireStations() {
-		return new ResponseEntity<>(service.getFireStations(), HttpStatus.OK);
-	}*/
-	
 	@PostMapping("/firestation")
 	public ResponseEntity<HttpStatus> addFireStation(@RequestBody FireStation station) {
 		service.addFireStation(station);
@@ -42,8 +37,8 @@ public class FireStationController {
 	}
 	
 	@DeleteMapping("/firestation")
-	public ResponseEntity<HttpStatus> deleteFireStation(@RequestBody FireStation station) {
-		service.deleteFireStation(station);
+	public ResponseEntity<HttpStatus> deleteFireStation(@RequestParam String address, @RequestParam String station) {
+		service.deleteFireStation(address, station);
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 	
@@ -59,7 +54,7 @@ public class FireStationController {
 		return new ResponseEntity<>(service.getPersonDTOFromAddress(address), HttpStatus.OK);
 	}
 	
-	@GetMapping("/flood/station")
+	@GetMapping("/flood/stations")
 	public ResponseEntity<List<HouseholdFromStationsDTO>> getHouseholdDTOFromStations(@RequestParam List<String> stations) {
 		//return new ResponseEntity<>(service.getPersonDataFromAddress(address), HttpStatus.OK);
 		return new ResponseEntity<>(service.getHouseholdDTOFromStations(stations), HttpStatus.OK);

@@ -28,7 +28,7 @@ public class MedicalRecordService {
 		repo.modifyMedicalRecord(record);
 	}
 	
-	public void deleteMedicalRecord(MedicalRecord record) {
-		repo.deleteMedicalRecord(record);
+	public void deleteMedicalRecord(String recordFirstName, String recordLastName) {
+		repo.deleteMedicalRecord(recordFirstName, recordLastName);
 	}
 }
