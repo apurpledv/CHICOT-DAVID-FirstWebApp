@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.openclassrooms.SafetyNetAlerts.repository.FireStationRepository;
+import com.openclassrooms.SafetyNetAlerts.repository.MedicalRecordRepository;
 import com.openclassrooms.SafetyNetAlerts.repository.PersonRepository;
 import com.openclassrooms.SafetyNetAlerts.util.SNAUtil;
 import com.openclassrooms.SafetyNetAlerts.model.ChildDataFromAddressDTO;
@@ -25,6 +26,9 @@ public class PersonService {
 	
 	@Autowired
 	private FireStationRepository FireRepo;
+	
+	@Autowired
+	private MedicalRecordRepository MedicalRepo;
 	
 	@Autowired
 	Mapper DTOmapper;
@@ -89,6 +93,10 @@ public class PersonService {
 		List<Person> personsList = PersonRepo.getPersons();
 		
 		for (Person person : personsList) {
+			// If there is no record, we cannot know if the person is a child or not, so we ignore
+			if (person.getRecord() == null)
+				continue;
+			
 			if (SNAUtil.getAge(person.getRecord().getBirthdate()) > SNAUtil.MAJORITY_AGE)
 				continue;
 			

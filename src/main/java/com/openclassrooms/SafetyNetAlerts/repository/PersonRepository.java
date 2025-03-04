@@ -12,7 +12,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 
 import lombok.extern.slf4j.Slf4j;
@@ -53,23 +52,12 @@ public class PersonRepository {
 		// Use it to create Java Objects
 		try {
 			PersonsList = mapper.readValue(mapper.writeValueAsString(FullJSONData.path("persons")), new TypeReference<List<Person>>(){});
-			
-			// We assign each person their respective Medical Record (if found)
-			List<MedicalRecord> RecordsListTemp = mapper.readValue(mapper.writeValueAsString(FullJSONData.path("medicalrecords")), new TypeReference<List<MedicalRecord>>(){});
-			for (Person person : PersonsList) {
-				for (MedicalRecord record : RecordsListTemp) {
-				    if (person.getFirstName().equals(record.getFirstName()) && person.getLastName().equals(record.getLastName())) {
-				    	person.setRecord(record);
-				    	break;
-				    }
-				}
-			}
 		} catch (JsonProcessingException e) {
 			log.error("Cannot load JSON data.");
 		}
 		log.info("Repository loaded successfully.");
 	}
-	
+
 	public Person getPerson(String firstName, String lastName) {
 		Person personFound = null;
 		for (Person person : PersonsList) {
@@ -91,7 +79,7 @@ public class PersonRepository {
 	
 	public void modifyPerson(Person personToChange) {
 		for (Person person : PersonsList) {
-		    if (personToChange.getFirstName().equals(person.getFirstName()) && personToChange.getLastName().equals(person.getLastName())) {
+		    if (personToChange.equals(person)) {
 		    	person.setAddress(personToChange.getAddress());
 		    	person.setCity(personToChange.getCity());
 		    	person.setZip(personToChange.getZip());
@@ -128,18 +116,4 @@ public class PersonRepository {
 		}
 		return ListOfPersonsFromAddress;
 	}
-	
-	/*
-	
-	public String getPersonDataFromAddress(String address) {
-		List<PersonDataFromAddressDTO> ListDTO = new ArrayList<PersonDataFromAddressDTO>();
-		for (Person person : PersonsList) {
-		    if (person.getAddress().equals(address)) {
-		    	ListDTO.add(DTOmapper.toDTO(address, person, getMedicalRecord(person.getFirstName(), person.getLastName())));
-		    }
-		}
-		
-		String ListString = Arrays.toString(ListDTO.toArray());
-		return ListString;
-	}*/
 }

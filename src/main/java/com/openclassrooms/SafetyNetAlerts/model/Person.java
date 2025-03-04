@@ -12,4 +12,13 @@ public class Person {
 	private String phone;
 	private String email;
 	private MedicalRecord record;
+	
+	public boolean equals(Person personToCompare) {
+		boolean result = false;
+		
+		if (personToCompare.getFirstName().equals(this.firstName) && personToCompare.getLastName().equals(this.lastName))
+			result = true;
+		
+		return result;
+	}
 }

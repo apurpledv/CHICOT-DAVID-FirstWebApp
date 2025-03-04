@@ -44,19 +44,16 @@ public class FireStationController {
 	
 	@GetMapping("/firestation")
 	public ResponseEntity<PersonsDataFromStationDTO> getPersonDTOFromStationNumber(@RequestParam String stationNumber) {
-		//return new ResponseEntity<>(service.getPersonDataFromAddress(address), HttpStatus.OK);
 		return new ResponseEntity<>(service.getPersonDTOFromStationNumber(stationNumber), HttpStatus.OK);
 	}
 	
 	@GetMapping("/fire")
 	public ResponseEntity<List<PersonDataFromAddressDTO>> getPersonDTOFromAddress(@RequestParam String address) {
-		//return new ResponseEntity<>(service.getPersonDataFromAddress(address), HttpStatus.OK);
 		return new ResponseEntity<>(service.getPersonDTOFromAddress(address), HttpStatus.OK);
 	}
 	
 	@GetMapping("/flood/stations")
 	public ResponseEntity<List<HouseholdFromStationsDTO>> getHouseholdDTOFromStations(@RequestParam List<String> stations) {
-		//return new ResponseEntity<>(service.getPersonDataFromAddress(address), HttpStatus.OK);
 		return new ResponseEntity<>(service.getHouseholdDTOFromStations(stations), HttpStatus.OK);
 	}
 }
