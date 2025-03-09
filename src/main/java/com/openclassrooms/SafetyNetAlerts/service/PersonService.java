@@ -33,6 +33,10 @@ public class PersonService {
 	@Autowired
 	Mapper DTOmapper;
 	
+	public void initRepo() {
+		PersonRepo.initRepo();
+	}
+	
 	public List<Person> getPersons() {
 		return PersonRepo.getPersons();
 	}
@@ -91,7 +95,6 @@ public class PersonService {
 		List<ChildDataFromAddressDTO> ListDTO = new ArrayList<ChildDataFromAddressDTO>();
 		
 		List<Person> personsList = PersonRepo.getPersons();
-		
 		for (Person person : personsList) {
 			// If there is no record, we cannot know if the person is a child or not, so we ignore
 			if (person.getRecord() == null)
@@ -107,7 +110,7 @@ public class PersonService {
 		    
 		    // We make sure we don't have that person in the "Other Members" list
 		    for (Person otherMember : otherMembers) {
-		    	if (person.getFirstName().equals(otherMember.getFirstName()) && person.getLastName().equals(otherMember.getLastName())) {
+		    	if (person.equals(otherMember)) {
 		    		otherMembers.remove(otherMember);
 		    		break;
 		    	}

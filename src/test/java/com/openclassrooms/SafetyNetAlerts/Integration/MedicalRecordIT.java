@@ -1,4 +1,4 @@
-package com.openclassrooms.SafetyNetAlerts;
+package com.openclassrooms.SafetyNetAlerts.Integration;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -18,7 +18,7 @@ import com.openclassrooms.SafetyNetAlerts.util.SNAUtil;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class MedicalRecordTests {
+public class MedicalRecordIT {
 	@Autowired
 	private MockMvc mockMvc;
 	

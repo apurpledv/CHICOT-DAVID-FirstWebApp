@@ -1,4 +1,4 @@
-package com.openclassrooms.SafetyNetAlerts;
+package com.openclassrooms.SafetyNetAlerts.Integration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +19,7 @@ import com.openclassrooms.SafetyNetAlerts.util.SNAUtil;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class FireStationTests {
+public class FireStationIT {
 	@Autowired
 	private MockMvc mockMvc;
 	

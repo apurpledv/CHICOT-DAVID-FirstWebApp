@@ -1,4 +1,4 @@
-package com.openclassrooms.SafetyNetAlerts;
+package com.openclassrooms.SafetyNetAlerts.Integration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +19,7 @@ import com.openclassrooms.SafetyNetAlerts.util.SNAUtil;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class PersonsTests {
+class PersonIT {
 	@Autowired
 	private MockMvc mockMvc;
 	
@@ -29,12 +29,12 @@ class PersonsTests {
 	}
 	
 	@Test
-	public void testGetPersons() throws Exception {
+	public void testGetPersonsIT() throws Exception {
 		this.mockMvc.perform(get("/person")).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
 	
 	@Test
-	public void testAddPerson() throws Exception {
+	public void testAddPersonIT() throws Exception {
 		String bodyContent = "{\"firstName\": \"Boba\", \"lastName\": \"Fett\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
 		
 		this.mockMvc.perform(post("/person")
@@ -44,7 +44,7 @@ class PersonsTests {
 	}
 	
 	@Test
-	public void testModifyPerson() throws Exception {
+	public void testModifyPersonIT() throws Exception {
 		String bodyContent = "{\"firstName\": \"John\", \"lastName\": \"Boyd\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
 		
 		this.mockMvc.perform(put("/person")
@@ -54,47 +54,47 @@ class PersonsTests {
 	}
 	
 	@Test
-	public void testDeletePerson() throws Exception {
+	public void testDeletePersonIT() throws Exception {
 		this.mockMvc.perform(delete("/person?firstName=John&lastName=Boyd")).andExpect(status().isOk());
 	}
 	
 	@Test
-	public void testChildAlert() throws Exception {
+	public void testChildAlertIT() throws Exception {
 		this.mockMvc.perform(get("/childAlert?address=1509 Culver St")).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
 	
 	@Test
-	public void testChildAlertNonValid() throws Exception {
+	public void testChildAlertNonValidIT() throws Exception {
 		this.mockMvc.perform(get("/childAlert")).andExpect(status().isBadRequest());
 	}
 	
 	@Test
-	public void testPhoneAlert() throws Exception {
+	public void testPhoneAlertIT() throws Exception {
 		this.mockMvc.perform(get("/phoneAlert?firestation=1")).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
 	
 	@Test
-	public void testPhoneAlertNonValid() throws Exception {
+	public void testPhoneAlertNonValidIT() throws Exception {
 		this.mockMvc.perform(get("/phoneAlert")).andExpect(status().isBadRequest());
 	}
 	
 	@Test
-	public void testPersonInfo() throws Exception {
+	public void testPersonInfoIT() throws Exception {
 		this.mockMvc.perform(get("/personInfo?lastName=Boyd")).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
 	
 	@Test
-	public void testPersonInfoNonValid() throws Exception {
+	public void testPersonInfoNonValidIT() throws Exception {
 		this.mockMvc.perform(get("/personInfo")).andExpect(status().isBadRequest());
 	}
 	
 	@Test
-	public void testCommunityEmail() throws Exception {
+	public void testCommunityEmailIT() throws Exception {
 		this.mockMvc.perform(get("/communityEmail?city=Culver")).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
 	
 	@Test
-	public void testCommunityEmailNonValid() throws Exception {
+	public void testCommunityEmailNonValidIT() throws Exception {
 		this.mockMvc.perform(get("/communityEmail")).andExpect(status().isBadRequest());
 	}
 }

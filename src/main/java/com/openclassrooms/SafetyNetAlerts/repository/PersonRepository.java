@@ -45,7 +45,7 @@ public class PersonRepository {
 		}
 	}
 	
-	private void initRepo() {
+	public void initRepo() {
 		// Get JSON from the file as exploitable data
 		getJSONFromFile();
 		
@@ -80,11 +80,21 @@ public class PersonRepository {
 	public void modifyPerson(Person personToChange) {
 		for (Person person : PersonsList) {
 		    if (personToChange.equals(person)) {
-		    	person.setAddress(personToChange.getAddress());
-		    	person.setCity(personToChange.getCity());
-		    	person.setZip(personToChange.getZip());
-		    	person.setPhone(personToChange.getPhone());
-		    	person.setEmail(personToChange.getEmail());
+		    	if (personToChange.getAddress() != null)
+		    		person.setAddress(personToChange.getAddress());
+
+		    	if (personToChange.getCity() != null)
+		    		person.setCity(personToChange.getCity());
+
+		    	if (personToChange.getZip() != null)
+		    		person.setZip(personToChange.getZip());
+
+		    	if (personToChange.getPhone() != null)
+		    		person.setPhone(personToChange.getPhone());
+
+		    	if (personToChange.getEmail() != null)
+		    		person.setEmail(personToChange.getEmail());
+		    	
 		    	break;
 		    }
 		}
