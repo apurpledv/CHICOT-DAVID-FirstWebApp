@@ -80,6 +80,8 @@ public class PersonRepositoryTest {
 		PersonRepo.deletePerson("John", "Boyd");
 		
 		assertEquals(null, PersonRepo.getPerson("John", "Boyd"));
+		
+		// This one still exists, thus it shouldn't be null
 		assertFalse(PersonRepo.getPerson("Jacob", "Boyd") == null);
 	}
 	

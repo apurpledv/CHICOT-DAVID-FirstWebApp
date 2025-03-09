@@ -45,7 +45,7 @@ public class MedicalRecordRepository {
 		}
 	}
 	
-	private void initRepo() {
+	public void initRepo() {
 		// Get JSON from the file as exploitable data
 		getJSONFromFile();
 		
