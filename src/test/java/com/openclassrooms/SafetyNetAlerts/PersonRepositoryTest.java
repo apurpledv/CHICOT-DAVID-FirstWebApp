@@ -6,8 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,12 +20,18 @@ import com.openclassrooms.SafetyNetAlerts.repository.PersonRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PersonRepositoryTest {
 	@Autowired
 	private PersonRepository PersonRepo;
 	
 	@BeforeEach
 	void initTests() {
+		PersonRepo.initRepo();
+	}
+	
+	@AfterAll
+	void cleanUp() {
 		PersonRepo.initRepo();
 	}
 	

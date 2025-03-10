@@ -45,7 +45,7 @@ public class FireStationRepository {
 		}
 	}
 	
-	private void initRepo() {
+	public void initRepo() {
 		// Get JSON from the file as exploitable data
 		getJSONFromFile();
 		
@@ -60,6 +60,18 @@ public class FireStationRepository {
 	
 	public List<FireStation> getFireStations() {
 		return FireStationList;
+	}
+	
+	public FireStation getFireStation(String address, String stationNumber) {
+		FireStation StationFound = null;
+		for (FireStation station : FireStationList) {
+		    if (station.getAddress().equals(address) && station.getStation().equals(stationNumber)) {
+		    	StationFound = station;
+		    	break;
+		    }
+		}
+		
+		return StationFound;
 	}
 	
 	public void addFireStation(FireStation station) {
