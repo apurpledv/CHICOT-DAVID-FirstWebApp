@@ -48,27 +48,27 @@ public class PersonService {
 	}
 	
 	public void addPerson(Person person) {
-		log.info("Adding Person: " + person);
+		log.debug("Adding Person: " + person);
 		PersonRepo.addPerson(person);
 	}
 	
 	public void modifyPerson(Person person) {
-		log.info("Modifying Person: " + person);
+		log.debug("Modifying Person: " + person);
 		PersonRepo.modifyPerson(person);
 	}
 	
 	public void deletePerson(String firstName, String lastName) {
-		log.info("Deleting " + firstName + " " + lastName);
+		log.debug("Deleting " + firstName + " " + lastName);
 		PersonRepo.deletePerson(firstName, lastName);
 	}
 	
 	public List<String> getPersonEmailsFromCity(String cityName) {
-		log.info("Retrieving Emails from City: " + cityName);
+		log.debug("Retrieving Emails from City: " + cityName);
 		return PersonRepo.getPersonEmailsFromCity(cityName);
 	}
 	
 	public List<String> getPhonesFromStationNumber(String stationNumber) {
-		log.info("Retrieving Phone Numbers from Station No." + stationNumber);
+		log.debug("Retrieving Phone Numbers from Station No." + stationNumber);
 		List<String> PhonesList = new ArrayList<String>();
 		List<FireStation> FireStationList = FireRepo.getFireStations();
 		
@@ -82,13 +82,13 @@ public class PersonService {
 		}
 		
 		if (PhonesList.isEmpty())
-			log.error("No Phone Number found for this Station.");
+			log.info("No Phone Number found for Station: " + stationNumber);
 		
 		return PhonesList;
 	}
 	
 	public List<PersonDataFromLastNameDTO> getPersonInfo(String lastName) {
-		log.info("Retrieving Data Of People With Last Name: " + lastName);
+		log.debug("Retrieving Data Of People With Last Name: " + lastName);
 		
 		List<PersonDataFromLastNameDTO> ListDTO = new ArrayList<PersonDataFromLastNameDTO>();
 		
@@ -100,11 +100,14 @@ public class PersonService {
 		    }
 		}
 		
+		if (ListDTO.isEmpty())
+			log.info("No Person found with last name: " + lastName);
+		
 		return ListDTO;
 	}
 	
 	public List<ChildDataFromAddressDTO> getChildrenFromAddress(String address) {
-		log.info("Retrieving List Of Children Living At Address: " + address);
+		log.debug("Retrieving List Of Children Living At Address: " + address);
 		
 		List<ChildDataFromAddressDTO> ListDTO = new ArrayList<ChildDataFromAddressDTO>();
 		
@@ -132,6 +135,9 @@ public class PersonService {
 		    
 		    ListDTO.add(DTOmapper.toChildDataFromAddressDto(person, otherMembers));
 		}
+		
+		if (ListDTO.isEmpty())
+			log.info("No Children found at address: " + address);
 		
 		return ListDTO;
 	}

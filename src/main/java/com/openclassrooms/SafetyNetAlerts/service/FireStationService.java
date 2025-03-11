@@ -19,7 +19,9 @@ import com.openclassrooms.SafetyNetAlerts.repository.PersonRepository;
 import com.openclassrooms.SafetyNetAlerts.util.SNAUtil;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Data
 @Service
 public class FireStationService {
@@ -40,19 +42,27 @@ public class FireStationService {
 		return FireRepo.getFireStations();
 	}
 	
+	public FireStation getFireStation(String address, String station) {
+		return FireRepo.getFireStation(address, station);
+	}
+	
 	public void addFireStation(FireStation station) {
+		log.debug("Adding Station: " + station);
 		FireRepo.addFireStation(station);
 	}
 	
 	public void modifyFireStation(FireStation station) {
+		log.debug("Modifying Station: " + station);
 		FireRepo.modifyFireStation(station);
 	}
 	
 	public void deleteFireStation(String address, String station) {
+		log.debug("Deleting Station at address: " + address);
 		FireRepo.deleteFireStation(address, station);
 	}
 	
 	public List<PersonDataFromAddressDTO> getPersonDTOFromAddress(String address) {
+		log.debug("Fetching Persons Data From Address: " + address);
 		List<PersonDataFromAddressDTO> ListDTO = new ArrayList<PersonDataFromAddressDTO>();
 		
 		List<Person> personsList = PersonRepo.getPersons();
@@ -64,31 +74,15 @@ public class FireStationService {
 		    }
 		}
 		
+		if (ListDTO.isEmpty())
+			log.info("No Person found at this address: " + address);
+		
 		return ListDTO;
 	}
 	
-	public List<HouseholdFromStationsDTO> getHouseholdDTOFromStations(List<String> stations) {
-		List<HouseholdFromStationsDTO> ListDTO = new ArrayList<HouseholdFromStationsDTO>();
-
-		List<String> HouseHoldAddresses = new ArrayList<String>();
-		
-		for (String stationNumber : stations) {
-			HouseHoldAddresses.addAll(FireRepo.getFireStationAddressesFromStationNumber(stationNumber));
-		}
-		
-		for (String address: HouseHoldAddresses) {
-			List<Person> personsPerAddress = PersonRepo.getPersonsFromAddress(address);
-			List<PersonFromHouseholdDTO> personsDTO = new ArrayList<PersonFromHouseholdDTO>();
-			for (Person personAtAddress: personsPerAddress) {
-				personsDTO.add(DTOmapper.toPersonFromHouseholdDto(personAtAddress));
-			}
-			
-			ListDTO.add(DTOmapper.toHouseholdFromStationsDto(address, personsDTO));
-		}
-		return ListDTO;	
-	}
-	
 	public PersonsDataFromStationDTO getPersonDTOFromStationNumber(String stationNumber) {
+		log.debug("Fetching Persons Data From Station Number: " + stationNumber);
+		
 		List<PersonFromStationNumberDTO> personsDTO = new ArrayList<PersonFromStationNumberDTO>();
 		List<String> Addresses = new ArrayList<String>();
 		
@@ -109,6 +103,37 @@ public class FireStationService {
 				personsDTO.add(DTOmapper.toPersonFromStationDto(personAtAddress));
 			}
 		}
+		
+		if (personsDTO.isEmpty())
+			log.info("No Person found that is handled by Station: " + stationNumber);
+		
 		return DTOmapper.toPersonsDataFromStationNumberDto(String.valueOf(adults), String.valueOf(children), personsDTO);	
+	}
+	
+	public List<HouseholdFromStationsDTO> getHouseholdDTOFromStations(List<String> stations) {
+		log.debug("Fetching Data Of Households Handled By Stations: " + stations);
+		
+		List<HouseholdFromStationsDTO> ListDTO = new ArrayList<HouseholdFromStationsDTO>();
+
+		List<String> HouseHoldAddresses = new ArrayList<String>();
+		
+		for (String stationNumber : stations) {
+			HouseHoldAddresses.addAll(FireRepo.getFireStationAddressesFromStationNumber(stationNumber));
+		}
+		
+		for (String address: HouseHoldAddresses) {
+			List<Person> personsPerAddress = PersonRepo.getPersonsFromAddress(address);
+			List<PersonFromHouseholdDTO> personsDTO = new ArrayList<PersonFromHouseholdDTO>();
+			for (Person personAtAddress: personsPerAddress) {
+				personsDTO.add(DTOmapper.toPersonFromHouseholdDto(personAtAddress));
+			}
+			
+			ListDTO.add(DTOmapper.toHouseholdFromStationsDto(address, personsDTO));
+		}
+		
+		if (ListDTO.isEmpty())
+			log.info("No Households found for Stations: " + stations);
+		
+		return ListDTO;	
 	}
 }

@@ -52,19 +52,19 @@ public class MedicalRecordService {
 	}
 	
 	public void addMedicalRecord(MedicalRecord record) {
-		log.info("Adding Record: " + record);
+		log.debug("Adding Record: " + record);
 		RecordRepo.addMedicalRecord(record);
 		updatePersonMedicalRecords();
 	}
 	
 	public void modifyMedicalRecord(MedicalRecord record) {
-		log.info("Modifying Record: " + record);
+		log.debug("Modifying Record: " + record);
 		RecordRepo.modifyMedicalRecord(record);
 		updatePersonMedicalRecords();
 	}
 	
 	public void deleteMedicalRecord(String recordFirstName, String recordLastName) {
-		log.info("Deleting Record of: " + recordFirstName + " " + recordLastName);
+		log.debug("Deleting Record of: " + recordFirstName + " " + recordLastName);
 		RecordRepo.deleteMedicalRecord(recordFirstName, recordLastName);
 		updatePersonMedicalRecords();
 	}
