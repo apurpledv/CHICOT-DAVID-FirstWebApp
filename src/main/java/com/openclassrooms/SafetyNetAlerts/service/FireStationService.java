@@ -32,6 +32,10 @@ public class FireStationService {
 	@Autowired
 	Mapper DTOmapper;
 	
+	public void initRepo() {
+		FireRepo.initRepo();
+	}
+	
 	public List<FireStation> getFireStations() {
 		return FireRepo.getFireStations();
 	}

@@ -12,7 +12,9 @@ import com.openclassrooms.SafetyNetAlerts.repository.PersonRepository;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Data
 @Service
 public class MedicalRecordService {
@@ -24,6 +26,7 @@ public class MedicalRecordService {
 	
 	@PostConstruct
 	public void updatePersonMedicalRecords() {
+		log.debug("Updating Medical Records.");
 		List<Person> Persons = PersonRepo.getPersons();
 		for (Person person : Persons) {
 			MedicalRecord record = RecordRepo.getMedicalRecord(person.getFirstName(), person.getLastName());
@@ -49,16 +52,19 @@ public class MedicalRecordService {
 	}
 	
 	public void addMedicalRecord(MedicalRecord record) {
+		log.info("Adding Record: " + record);
 		RecordRepo.addMedicalRecord(record);
 		updatePersonMedicalRecords();
 	}
 	
 	public void modifyMedicalRecord(MedicalRecord record) {
+		log.info("Modifying Record: " + record);
 		RecordRepo.modifyMedicalRecord(record);
 		updatePersonMedicalRecords();
 	}
 	
 	public void deleteMedicalRecord(String recordFirstName, String recordLastName) {
+		log.info("Deleting Record of: " + recordFirstName + " " + recordLastName);
 		RecordRepo.deleteMedicalRecord(recordFirstName, recordLastName);
 		updatePersonMedicalRecords();
 	}

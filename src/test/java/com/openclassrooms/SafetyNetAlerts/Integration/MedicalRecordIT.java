@@ -10,6 +10,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,23 +50,32 @@ public class MedicalRecordIT {
 	}
 	
 	@Test
-	public void testGetMedicalRecords() throws Exception {
+	public void testGetMedicalRecordsIT() throws Exception {
 		MvcResult mvcResult = this.mockMvc.perform(get("/medicalRecord"))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andReturn();
 
 		String Response = mvcResult.getResponse().getContentAsString();
-		String ValidRecordFirstName = JsonPath.parse(Response).read("$[0].firstName");
-		String ValidRecordLastName = JsonPath.parse(Response).read("$[0].lastName");
+		String ResultRecordFirstName = JsonPath.parse(Response).read("$[0].firstName");
+		String ResultRecordLastName = JsonPath.parse(Response).read("$[0].lastName");
 		
-		assertEquals("John", ValidRecordFirstName);
-		assertEquals("Boyd", ValidRecordLastName);
+		List<MedicalRecord> RecordsList = service.getMedicalRecords();
+		String ExpectedFirstName = RecordsList.get(0).getFirstName();
+		String ExpectedLastName = RecordsList.get(0).getLastName();
+		
+		assertEquals(ExpectedFirstName, ResultRecordFirstName);
+		assertEquals(ExpectedLastName, ResultRecordLastName);
 	}
 	
 	@Test
-	public void testAddMedicalRecord() throws Exception {
-		String BodyContent = "{ \"firstName\":\"Bob\", \"lastName\":\"Bipp\", \"birthdate\":\"03/06/1901\", \"medications\":[\"aznol:350mg\", \"hydrapermazol:100mg\"], \"allergies\":[\"nillacilan\"] },";
+	public void testAddMedicalRecordIT() throws Exception {
+		String BodyContent = "{ "
+				+ "\"firstName\":\"Bob\","
+				+ "\"lastName\":\"Bipp\", "
+				+ "\"birthdate\":\"03/06/1901\", "
+				+ "\"medications\":[\"aznol:350mg\", \"hydrapermazol:100mg\"], "
+				+ "\"allergies\":[\"nillacilan\"] },";
 		
 		this.mockMvc.perform(post("/medicalRecord")
 			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
@@ -77,7 +88,7 @@ public class MedicalRecordIT {
 	}
 	
 	@Test
-	public void testModifyMedicalRecord() throws Exception {
+	public void testModifyMedicalRecordIT() throws Exception {
 		// The medications and allergies aren't empty
 		MedicalRecord RecordToChange = service.getMedicalRecord("John", "Boyd");
 		assertFalse(RecordToChange.getMedications().isEmpty());
@@ -87,7 +98,7 @@ public class MedicalRecordIT {
 		String BodyContent = "{ "
 				+ "\"firstName\":\"John\", "
 				+ "\"lastName\":\"Boyd\","
-				+ " \"birthdate\":\"08/30/1910\", "
+				+ "\"birthdate\":\"08/30/1910\", "
 				+ "\"medications\":[], "
 				+ "\"allergies\":[] },";
 
@@ -102,7 +113,7 @@ public class MedicalRecordIT {
 	}
 	
 	@Test
-	public void testDeleteMedicalRecord() throws Exception {
+	public void testDeleteMedicalRecordIT() throws Exception {
 		// The medications and allergies aren't empty
 		MedicalRecord RecordToDelete = service.getMedicalRecord("John", "Boyd");
 		assertFalse(RecordToDelete == null);

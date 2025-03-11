@@ -17,7 +17,9 @@ import com.openclassrooms.SafetyNetAlerts.model.Person;
 import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromLastNameDTO;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Data
 @Service
 public class PersonService {
@@ -46,22 +48,27 @@ public class PersonService {
 	}
 	
 	public void addPerson(Person person) {
+		log.info("Adding Person: " + person);
 		PersonRepo.addPerson(person);
 	}
 	
 	public void modifyPerson(Person person) {
+		log.info("Modifying Person: " + person);
 		PersonRepo.modifyPerson(person);
 	}
 	
 	public void deletePerson(String firstName, String lastName) {
+		log.info("Deleting " + firstName + " " + lastName);
 		PersonRepo.deletePerson(firstName, lastName);
 	}
 	
 	public List<String> getPersonEmailsFromCity(String cityName) {
+		log.info("Retrieving Emails from City: " + cityName);
 		return PersonRepo.getPersonEmailsFromCity(cityName);
 	}
 	
 	public List<String> getPhonesFromStationNumber(String stationNumber) {
+		log.info("Retrieving Phone Numbers from Station No." + stationNumber);
 		List<String> PhonesList = new ArrayList<String>();
 		List<FireStation> FireStationList = FireRepo.getFireStations();
 		
@@ -74,10 +81,15 @@ public class PersonService {
 		    	PhonesList.add(person.getPhone());
 		}
 		
+		if (PhonesList.isEmpty())
+			log.error("No Phone Number found for this Station.");
+		
 		return PhonesList;
 	}
 	
 	public List<PersonDataFromLastNameDTO> getPersonInfo(String lastName) {
+		log.info("Retrieving Data Of People With Last Name: " + lastName);
+		
 		List<PersonDataFromLastNameDTO> ListDTO = new ArrayList<PersonDataFromLastNameDTO>();
 		
 		List<Person> personsList = PersonRepo.getPersons();
@@ -92,6 +104,8 @@ public class PersonService {
 	}
 	
 	public List<ChildDataFromAddressDTO> getChildrenFromAddress(String address) {
+		log.info("Retrieving List Of Children Living At Address: " + address);
+		
 		List<ChildDataFromAddressDTO> ListDTO = new ArrayList<ChildDataFromAddressDTO>();
 		
 		List<Person> personsList = PersonRepo.getPersons();
