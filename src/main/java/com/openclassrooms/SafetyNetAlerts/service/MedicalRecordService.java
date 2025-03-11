@@ -36,8 +36,16 @@ public class MedicalRecordService {
 		}
 	}
 	
+	public void initRepo() {
+		RecordRepo.initRepo();
+	}
+	
 	public List<MedicalRecord> getMedicalRecords() {
 		return RecordRepo.getMedicalRecords();
+	}
+	
+	public MedicalRecord getMedicalRecord(String firstName, String lastName) {
+		return RecordRepo.getMedicalRecord(firstName, lastName);
 	}
 	
 	public void addMedicalRecord(MedicalRecord record) {

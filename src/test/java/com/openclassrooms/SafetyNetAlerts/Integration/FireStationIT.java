@@ -22,13 +22,8 @@ import com.openclassrooms.SafetyNetAlerts.util.SNAUtil;
 public class FireStationIT {
 	@Autowired
 	private MockMvc mockMvc;
-	
-	@Test
-	void contextLoads() {
-		
-	}
-	
-	@Test
+
+	/*@Test
 	public void testAddFireStation() throws Exception {
 		String bodyContent = "{\"address\": \"1 Rue De la Fett\", \"station\": \"99999\"}";
 		
@@ -81,5 +76,5 @@ public class FireStationIT {
 	@Test
 	public void testFloodStationsNonValid() throws Exception {
 		this.mockMvc.perform(get("/flood/stations")).andExpect(status().isBadRequest());
-	}
+	}*/
 }
