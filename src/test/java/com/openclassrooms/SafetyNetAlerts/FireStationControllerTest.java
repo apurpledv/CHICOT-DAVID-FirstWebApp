@@ -36,7 +36,7 @@ public class FireStationControllerTest {
 	FireStationService service;
 	
 	@BeforeEach 
-    void resetTests() {
+    void resetTests() throws Exception {
 		when(service.getFireStations()).thenReturn(new ArrayList<FireStation>());
     }
 	
@@ -53,6 +53,18 @@ public class FireStationControllerTest {
 	}
 	
 	@Test
+	public void testAddFireStationThrowsException() throws Exception {
+		Mockito.doThrow(new Exception()).when(service).addFireStation(any(FireStation.class));
+		
+		String fakeBodyContent = "{}";
+		
+		this.mockMvc.perform(post("/firestation")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(fakeBodyContent)
+		).andExpect(status().isInternalServerError());
+	}
+	
+	@Test
 	public void testModifyFireStation() throws Exception {
 		String fakeBodyContent = "{}";
 		
@@ -65,6 +77,18 @@ public class FireStationControllerTest {
 	}
 	
 	@Test
+	public void testModifyFireStationThrowsException() throws Exception {
+		Mockito.doThrow(new Exception()).when(service).modifyFireStation(any(FireStation.class));
+		
+		String fakeBodyContent = "{}";
+		
+		this.mockMvc.perform(put("/firestation")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(fakeBodyContent)
+		).andExpect(status().isInternalServerError());
+	}
+	
+	@Test
 	public void testDeleteFireStation() throws Exception {
 		this.mockMvc.perform(delete("/firestation?address=A&station=A"))
 			.andExpect(status().isOk());
@@ -73,11 +97,27 @@ public class FireStationControllerTest {
 	}
 	
 	@Test
+	public void testDeleteFireStationThrowsException() throws Exception {
+		Mockito.doThrow(new Exception()).when(service).deleteFireStation(any(String.class), any(String.class));
+		
+		this.mockMvc.perform(delete("/firestation?address=A&station=A"))
+			.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
 	public void testGetPersonDTOFromStationNumber() throws Exception {
 		this.mockMvc.perform(get("/firestation?stationNumber=1"))
 			.andExpect(status().isOk());
 		
 		verify(service, Mockito.times(1)).getPersonDTOFromStationNumber(any(String.class));
+	}
+	
+	@Test
+	public void testGetPersonDTOFromStationNumberThrowsException() throws Exception {
+		Mockito.doThrow(new Exception()).when(service).getPersonDTOFromStationNumber(any(String.class));
+		
+		this.mockMvc.perform(get("/firestation?stationNumber=1"))
+			.andExpect(status().isInternalServerError());
 	}
 	
 	@Test
@@ -94,6 +134,14 @@ public class FireStationControllerTest {
 			.andExpect(status().isOk());
 		
 		verify(service, Mockito.times(1)).getPersonDTOFromAddress(any(String.class));
+	}
+	
+	@Test
+	public void testGetPersonDTOFromAddressThrowsException() throws Exception {
+		Mockito.doThrow(new Exception()).when(service).getPersonDTOFromAddress(any(String.class));
+		
+		this.mockMvc.perform(get("/fire?address=1 Random Address In Random City"))
+			.andExpect(status().isInternalServerError());
 	}
 	
 	@Test
@@ -115,6 +163,19 @@ public class FireStationControllerTest {
 			.andExpect(status().isOk());
 		
 		verify(service, Mockito.times(1)).getHouseholdDTOFromStations(eq(stationsList));
+	}
+	
+	@Test
+	public void testGetHouseholdDTOFromStationsThrowsException() throws Exception {
+		// Equivalent List of stations of this request's RequestParam 'stations'
+		List<String> stationsList = new ArrayList<String>();
+		stationsList.add("1");
+		stationsList.add("2");
+				
+		Mockito.doThrow(new Exception()).when(service).getHouseholdDTOFromStations(eq(stationsList));
+		
+		this.mockMvc.perform(get("/flood/stations?stations=1,2"))
+			.andExpect(status().isInternalServerError());
 	}
 	
 	@Test

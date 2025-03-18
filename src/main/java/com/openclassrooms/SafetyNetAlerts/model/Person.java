@@ -13,6 +13,11 @@ public class Person {
 	private String email;
 	private MedicalRecord record;
 	
+	@Override
+	public int hashCode() {
+        return 1;
+    }
+	
 	public boolean equals(Person personToCompare) {
 		boolean result = false;
 		

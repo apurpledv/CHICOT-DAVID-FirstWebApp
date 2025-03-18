@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class FireStationRepository {
-	private String fileName = "src/main/resources/data.json";
+	private String FileName = "src/main/resources/data.json";
 	private JsonNode FullJSONData;
 
 	private ObjectMapper mapper = new ObjectMapper();
@@ -30,7 +30,7 @@ public class FireStationRepository {
 		initRepo();
 	}
 	
- 	public void getJSONFromFile() {
+ 	public void getJSONFromFile(String fileName) {
 		// Get access to the file
 		try {
 			File dataFile = new File(fileName);
@@ -41,21 +41,24 @@ public class FireStationRepository {
 			// Use ObjectMapper to get the JSON as exploitable data
 			FullJSONData = mapper.readTree(JsonFromFile);
 		} catch (Exception e) {
-			log.error("Cannot open requested file.");
+			log.error(e.toString());
 		}
 	}
 	
-	public void initRepo() {
+ 	public void initRepo() {
+ 		initRepo(this.FileName);
+ 	}
+	
+	public void initRepo(String fileName) {
 		// Get JSON from the file as exploitable data
-		getJSONFromFile();
+		getJSONFromFile(fileName);
 		
 		// Use it to create Java Objects
 		try {
 			FireStationList = mapper.readValue(mapper.writeValueAsString(FullJSONData.path("firestations")), new TypeReference<List<FireStation>>(){});
 		} catch (JsonProcessingException e) {
-			log.error("Cannot load JSON data.");
+			log.error(e.toString());
 		}
-		log.info("Repository loaded successfully.");
 	}
 	
 	public List<FireStation> getFireStations() {
@@ -76,6 +79,8 @@ public class FireStationRepository {
 	
 	public void addFireStation(FireStation station) {
 		FireStationList.add(station);
+		
+		log.debug("Station added successfully.");
 	}
 	
 	public void modifyFireStation(FireStation stationToChange) {
@@ -85,6 +90,8 @@ public class FireStationRepository {
 		    	break;
 		    }
 		}
+		
+		log.debug("Station modified successfully.");
 	}
 	
 	public void deleteFireStation(String address, String stationNumber) {
@@ -94,6 +101,8 @@ public class FireStationRepository {
 				break;
 			}
 		}
+		
+		log.debug("Station deleted successfully.");
 	}
 	
 	public String getFireStationNumberFromAddress(String address) {

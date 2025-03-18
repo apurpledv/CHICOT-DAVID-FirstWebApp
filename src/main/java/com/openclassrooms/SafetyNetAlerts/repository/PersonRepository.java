@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class PersonRepository {
-	private String fileName = "src/main/resources/data.json";
+	private String FileName = "src/main/resources/data.json";
 	private JsonNode FullJSONData;
 
 	private ObjectMapper mapper = new ObjectMapper();
@@ -30,7 +30,7 @@ public class PersonRepository {
 		initRepo();
 	}
 	
- 	public void getJSONFromFile() {
+ 	public void getJSONFromFile(String fileName) {
 		// Get access to the file
 		try {
 			File dataFile = new File(fileName);
@@ -41,21 +41,24 @@ public class PersonRepository {
 			// Use ObjectMapper to get the JSON as exploitable data
 			FullJSONData = mapper.readTree(JsonFromFile);
 		} catch (Exception e) {
-			log.error("Cannot open requested file.");
+			log.error(e.toString());
 		}
 	}
+ 	
+ 	public void initRepo() {
+ 		initRepo(this.FileName);
+ 	}
 	
-	public void initRepo() {
+	public void initRepo(String fileName) {
 		// Get JSON from the file as exploitable data
-		getJSONFromFile();
+		getJSONFromFile(fileName);
 		
 		// Use it to create Java Objects
 		try {
 			PersonsList = mapper.readValue(mapper.writeValueAsString(FullJSONData.path("persons")), new TypeReference<List<Person>>(){});
 		} catch (JsonProcessingException e) {
-			log.error("Cannot load JSON data.");
+			log.error(e.toString());
 		}
-		log.info("Repository loaded successfully.");
 	}
 
 	public Person getPerson(String firstName, String lastName) {
@@ -75,29 +78,23 @@ public class PersonRepository {
 	
 	public void addPerson(Person person) {
 		PersonsList.add(person);
+		
+		log.debug("Person added successfully.");
 	}
 	
 	public void modifyPerson(Person personToChange) {
 		for (Person person : PersonsList) {
 		    if (personToChange.equals(person)) {
-		    	if (personToChange.getAddress() != null)
-		    		person.setAddress(personToChange.getAddress());
-
-		    	if (personToChange.getCity() != null)
-		    		person.setCity(personToChange.getCity());
-
-		    	if (personToChange.getZip() != null)
-		    		person.setZip(personToChange.getZip());
-
-		    	if (personToChange.getPhone() != null)
-		    		person.setPhone(personToChange.getPhone());
-
-		    	if (personToChange.getEmail() != null)
-		    		person.setEmail(personToChange.getEmail());
-		    	
+	    		person.setAddress(personToChange.getAddress());
+	    		person.setCity(personToChange.getCity());
+	    		person.setZip(personToChange.getZip());
+	    		person.setPhone(personToChange.getPhone());
+	    		person.setEmail(personToChange.getEmail());
 		    	break;
 		    }
 		}
+		
+		log.debug("Person modified successfully.");
 	}
 	
 	public void deletePerson(String firstName, String lastName) {
@@ -107,6 +104,8 @@ public class PersonRepository {
 		    	break;
 		    }
 		}
+		
+		log.debug("Person deleted successfully.");
 	}
 	
 	public List<String> getPersonEmailsFromCity(String cityName) {

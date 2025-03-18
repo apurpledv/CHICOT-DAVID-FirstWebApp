@@ -26,7 +26,6 @@ public class MedicalRecordService {
 	
 	@PostConstruct
 	public void updatePersonMedicalRecords() {
-		log.debug("Updating Medical Records.");
 		List<Person> Persons = PersonRepo.getPersons();
 		for (Person person : Persons) {
 			MedicalRecord record = RecordRepo.getMedicalRecord(person.getFirstName(), person.getLastName());
@@ -43,29 +42,36 @@ public class MedicalRecordService {
 		RecordRepo.initRepo();
 	}
 	
-	public List<MedicalRecord> getMedicalRecords() {
+	public void initRepo(String fileName) {
+		RecordRepo.initRepo(fileName);
+	}
+	
+	public List<MedicalRecord> getMedicalRecords() throws Exception {
 		return RecordRepo.getMedicalRecords();
 	}
 	
-	public MedicalRecord getMedicalRecord(String firstName, String lastName) {
+	public MedicalRecord getMedicalRecord(String firstName, String lastName) throws Exception {
 		return RecordRepo.getMedicalRecord(firstName, lastName);
 	}
 	
-	public void addMedicalRecord(MedicalRecord record) {
-		log.debug("Adding Record: " + record);
+	public void addMedicalRecord(MedicalRecord record) throws Exception {
 		RecordRepo.addMedicalRecord(record);
 		updatePersonMedicalRecords();
+		
+		log.debug("Record added successfully.");
 	}
 	
-	public void modifyMedicalRecord(MedicalRecord record) {
-		log.debug("Modifying Record: " + record);
+	public void modifyMedicalRecord(MedicalRecord record) throws Exception {
 		RecordRepo.modifyMedicalRecord(record);
 		updatePersonMedicalRecords();
+		
+		log.debug("Record modified successfully.");
 	}
 	
-	public void deleteMedicalRecord(String recordFirstName, String recordLastName) {
-		log.debug("Deleting Record of: " + recordFirstName + " " + recordLastName);
+	public void deleteMedicalRecord(String recordFirstName, String recordLastName) throws Exception {
 		RecordRepo.deleteMedicalRecord(recordFirstName, recordLastName);
 		updatePersonMedicalRecords();
+		
+		log.debug("Record deleted successfully.");
 	}
 }

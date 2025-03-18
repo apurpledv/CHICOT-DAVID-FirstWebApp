@@ -75,37 +75,37 @@ public class PersonServiceTest {
     }
 	
 	@Test
-	void testGetPersonsAsService() {
+	void testGetPersonsAsService() throws Exception {
 		service.getPersons();
 		verify(PersonRepo, Mockito.times(1)).getPersons();
 	}
 	
 	@Test
-	void testAddPersonAsService() {
+	void testAddPersonAsService() throws Exception {
 		service.addPerson(new Person());
 		verify(PersonRepo, Mockito.times(1)).addPerson(any(Person.class));
 	}
 	
 	@Test
-	void testModifyPersonAsService() {
+	void testModifyPersonAsService() throws Exception {
 		service.modifyPerson(new Person());
 		verify(PersonRepo, Mockito.times(1)).modifyPerson(any(Person.class));
 	}
 	
 	@Test
-	void testDeletePersonAsService() {
+	void testDeletePersonAsService() throws Exception {
 		service.deletePerson("A", "A");
 		verify(PersonRepo, Mockito.times(1)).deletePerson(any(String.class), any(String.class));
 	}
 	
 	@Test
-	void testGetPersonEmailsFromCityAsService() {
+	void testGetPersonEmailsFromCityAsService() throws Exception {
 		service.getPersonEmailsFromCity("Culver");
 		verify(PersonRepo, Mockito.times(1)).getPersonEmailsFromCity(any(String.class));
 	}
 	
 	@Test
-	void testGetPhonesFromStationNumberAsService() {
+	void testGetPhonesFromStationNumberAsService() throws Exception {
 		service.getPhonesFromStationNumber("1");
 
 		verify(FireRepo, Mockito.times(1)).getFireStations();
@@ -113,7 +113,7 @@ public class PersonServiceTest {
 	}
 
 	@Test
-	void testGetPersonInfoAsService() {
+	void testGetPersonInfoAsService() throws Exception {
 		service.getPersonInfo("Daddy");
 
 		verify(PersonRepo, Mockito.times(1)).getPersons();
@@ -121,7 +121,7 @@ public class PersonServiceTest {
 	}
 	
 	@Test
-	void testGetChildrenFromAddressAsService() {
+	void testGetChildrenFromAddressAsService() throws Exception {
 		service.getChildrenFromAddress("Do");
 		
 

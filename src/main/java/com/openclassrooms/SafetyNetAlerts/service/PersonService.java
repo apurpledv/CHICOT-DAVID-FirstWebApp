@@ -39,36 +39,35 @@ public class PersonService {
 		PersonRepo.initRepo();
 	}
 	
-	public List<Person> getPersons() {
+	public void initRepo(String fileName) {
+		PersonRepo.initRepo(fileName);
+	}
+	
+	public List<Person> getPersons() throws Exception {
 		return PersonRepo.getPersons();
 	}
 	
-	public Person getPerson(String firstName, String lastName) {
+	public Person getPerson(String firstName, String lastName) throws Exception {
 		return PersonRepo.getPerson(firstName, lastName);
 	}
 	
-	public void addPerson(Person person) {
-		log.debug("Adding Person: " + person);
+	public void addPerson(Person person) throws Exception {
 		PersonRepo.addPerson(person);
 	}
 	
-	public void modifyPerson(Person person) {
-		log.debug("Modifying Person: " + person);
+	public void modifyPerson(Person person) throws Exception {
 		PersonRepo.modifyPerson(person);
 	}
 	
-	public void deletePerson(String firstName, String lastName) {
-		log.debug("Deleting " + firstName + " " + lastName);
+	public void deletePerson(String firstName, String lastName) throws Exception {
 		PersonRepo.deletePerson(firstName, lastName);
 	}
 	
-	public List<String> getPersonEmailsFromCity(String cityName) {
-		log.debug("Retrieving Emails from City: " + cityName);
+	public List<String> getPersonEmailsFromCity(String cityName) throws Exception {
 		return PersonRepo.getPersonEmailsFromCity(cityName);
 	}
 	
-	public List<String> getPhonesFromStationNumber(String stationNumber) {
-		log.debug("Retrieving Phone Numbers from Station No." + stationNumber);
+	public List<String> getPhonesFromStationNumber(String stationNumber) throws Exception {
 		List<String> PhonesList = new ArrayList<String>();
 		List<FireStation> FireStationList = FireRepo.getFireStations();
 		
@@ -80,16 +79,13 @@ public class PersonService {
 		    for (Person person : PersonsAtAddressList)
 		    	PhonesList.add(person.getPhone());
 		}
-		
-		if (PhonesList.isEmpty())
-			log.info("No Phone Number found for Station: " + stationNumber);
+
+		log.debug("Number of results: " + PhonesList.size());
 		
 		return PhonesList;
 	}
 	
-	public List<PersonDataFromLastNameDTO> getPersonInfo(String lastName) {
-		log.debug("Retrieving Data Of People With Last Name: " + lastName);
-		
+	public List<PersonDataFromLastNameDTO> getPersonInfo(String lastName) throws Exception {
 		List<PersonDataFromLastNameDTO> ListDTO = new ArrayList<PersonDataFromLastNameDTO>();
 		
 		List<Person> personsList = PersonRepo.getPersons();
@@ -100,23 +96,18 @@ public class PersonService {
 		    }
 		}
 		
-		if (ListDTO.isEmpty())
-			log.info("No Person found with last name: " + lastName);
+		log.debug("Number of results: " + ListDTO.size());
 		
 		return ListDTO;
 	}
 	
-	public List<ChildDataFromAddressDTO> getChildrenFromAddress(String address) {
+	public List<ChildDataFromAddressDTO> getChildrenFromAddress(String address) throws Exception {
 		log.debug("Retrieving List Of Children Living At Address: " + address);
 		
 		List<ChildDataFromAddressDTO> ListDTO = new ArrayList<ChildDataFromAddressDTO>();
 		
 		List<Person> personsList = PersonRepo.getPersons();
 		for (Person person : personsList) {
-			// If there is no record, we cannot know if the person is a child or not, so we ignore
-			if (person.getRecord() == null)
-				continue;
-			
 			if (SNAUtil.getAge(person.getRecord().getBirthdate()) > SNAUtil.MAJORITY_AGE)
 				continue;
 			
@@ -135,9 +126,8 @@ public class PersonService {
 		    
 		    ListDTO.add(DTOmapper.toChildDataFromAddressDto(person, otherMembers));
 		}
-		
-		if (ListDTO.isEmpty())
-			log.info("No Children found at address: " + address);
+
+		log.debug("Number of results: " + ListDTO.size());
 		
 		return ListDTO;
 	}

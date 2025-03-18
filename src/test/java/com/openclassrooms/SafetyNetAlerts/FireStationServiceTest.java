@@ -80,31 +80,31 @@ public class FireStationServiceTest {
 	}
 	
 	@Test
-	void testGetStationsAsService() {
+	void testGetStationsAsService() throws Exception {
 		service.getFireStations();
 		verify(FireRepo, Mockito.times(1)).getFireStations();
 	}
 	
 	@Test
-	void testAddStationAsService() {
+	void testAddStationAsService() throws Exception {
 		service.addFireStation(new FireStation());
 		verify(FireRepo, Mockito.times(1)).addFireStation(any(FireStation.class));
 	}
 	
 	@Test
-	void testModifyStationAsService() {
+	void testModifyStationAsService() throws Exception {
 		service.modifyFireStation(new FireStation());
 		verify(FireRepo, Mockito.times(1)).modifyFireStation(any(FireStation.class));
 	}
 	
 	@Test
-	void testDeleteStationAsService() {
+	void testDeleteStationAsService() throws Exception {
 		service.deleteFireStation("Do", "1");
 		verify(FireRepo, Mockito.times(1)).deleteFireStation(any(String.class), any(String.class));
 	}
 	
 	@Test
-	void testGetPersonDTOFromAddressAsService() {
+	void testGetPersonDTOFromAddressAsService() throws Exception {
 		when(FireRepo.getFireStationNumberFromAddress(any(String.class))).thenReturn("1");
 		
 		service.getPersonDTOFromAddress("Do");
@@ -115,7 +115,7 @@ public class FireStationServiceTest {
 	}
 	
 	@Test
-	void testGetPersonDTOFromAddressAsServiceNonValid() {
+	void testGetPersonDTOFromAddressAsServiceNonValid() throws Exception {
 		when(FireRepo.getFireStationNumberFromAddress(any(String.class))).thenReturn("1");
 		
 		service.getPersonDTOFromAddress("Dooooooooooooooo");
@@ -128,7 +128,7 @@ public class FireStationServiceTest {
 	}
 	
 	@Test
-	void testGetHouseholdDTOFromStationsAsService() {
+	void testGetHouseholdDTOFromStationsAsService() throws Exception {
 		// Mocking the station address return values depending on the station numbers provided
 		List<String> FakeAddressesS1 = new ArrayList<String>();
 		FakeAddressesS1.add("Do");
@@ -143,7 +143,7 @@ public class FireStationServiceTest {
 		// Mocking the 'toPersonFromHouseholdDTO' to return a fake person DTO
 		List<PersonFromHouseholdDTO> FakePersonsDTOList = new ArrayList<PersonFromHouseholdDTO>();
 		PersonFromHouseholdDTO FakePersonDTO = new PersonFromHouseholdDTO(
-			"Daddy", "0101010101", "14", new ArrayList<String>(), new ArrayList<String>()
+			"Daddy", "0101010101", 14, new ArrayList<String>(), new ArrayList<String>()
 		);
 		FakePersonsDTOList.add(FakePersonDTO);
 		
@@ -168,7 +168,7 @@ public class FireStationServiceTest {
 	}
 	
 	@Test
-	void testGetHouseholdDTOFromStationsAsServiceNonValid() {
+	void testGetHouseholdDTOFromStationsAsServiceNonValid() throws Exception {
 		// No mocks since the station numbers aren't valid
 		
 		// 'Whens'
@@ -188,7 +188,7 @@ public class FireStationServiceTest {
 	}
 	
 	@Test
-	void testGetPersonDTOFromStationNumberAsService() {
+	void testGetPersonDTOFromStationNumberAsService() throws Exception {
 		// Mocking the station address return values depending on the station numbers provided
 		List<String> FakeAddresses = new ArrayList<String>();
 		FakeAddresses.add("Do");
@@ -216,11 +216,11 @@ public class FireStationServiceTest {
 		verify(FireRepo, Mockito.times(1)).getFireStationAddressesFromStationNumber(any(String.class));
 		verify(PersonRepo, Mockito.times(1)).getPersonsFromAddress(any(String.class));
 		verify(mapper, Mockito.times(1)).toPersonFromStationDto(any(Person.class));
-		verify(mapper, Mockito.times(1)).toPersonsDataFromStationNumberDto(any(String.class), any(String.class), eq(FakePersonsDTOList));
+		verify(mapper, Mockito.times(1)).toPersonsDataFromStationNumberDto(any(int.class), any(int.class), eq(FakePersonsDTOList));
 	}
 	
 	@Test
-	void testGetPersonDTOFromStationNumberAsServiceNonValid() {
+	void testGetPersonDTOFromStationNumberAsServiceNonValid() throws Exception {
 		// No mocks since the station numbers aren't valid
 		
 		// 'Whens'

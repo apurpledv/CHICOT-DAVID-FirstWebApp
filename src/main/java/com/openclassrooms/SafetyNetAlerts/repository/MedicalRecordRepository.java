@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class MedicalRecordRepository {
-	private String fileName = "src/main/resources/data.json";
+	private String FileName = "src/main/resources/data.json";
 	private JsonNode FullJSONData;
 
 	private ObjectMapper mapper = new ObjectMapper();
@@ -30,7 +30,7 @@ public class MedicalRecordRepository {
 		initRepo();
 	}
 	
- 	public void getJSONFromFile() {
+ 	public void getJSONFromFile(String fileName) {
 		// Get access to the file
 		try {
 			File dataFile = new File(fileName);
@@ -41,21 +41,24 @@ public class MedicalRecordRepository {
 			// Use ObjectMapper to get the JSON as exploitable data
 			FullJSONData = mapper.readTree(JsonFromFile);
 		} catch (Exception e) {
-			log.error("Cannot open requested file.");
+			log.error(e.toString());
 		}
 	}
 	
-	public void initRepo() {
+ 	public void initRepo() {
+ 		initRepo(this.FileName);
+ 	}
+	
+	public void initRepo(String fileName) {
 		// Get JSON from the file as exploitable data
-		getJSONFromFile();
+		getJSONFromFile(fileName);
 		
 		// Use it to create Java Objects
 		try {
 			RecordList = mapper.readValue(mapper.writeValueAsString(FullJSONData.path("medicalrecords")), new TypeReference<List<MedicalRecord>>(){});
 		} catch (JsonProcessingException e) {
-			log.error("Cannot load JSON data.");
+			log.error(e.toString());
 		}
-		log.info("Repository loaded successfully.");
 	}
 	
 	public MedicalRecord getMedicalRecord(String firstName, String lastName) {

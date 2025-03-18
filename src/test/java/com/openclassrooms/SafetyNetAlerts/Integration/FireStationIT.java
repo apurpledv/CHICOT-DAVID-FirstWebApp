@@ -16,9 +16,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
@@ -27,9 +24,6 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.jayway.jsonpath.JsonPath;
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
-import com.openclassrooms.SafetyNetAlerts.model.HouseholdFromStationsDTO;
-import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromAddressDTO;
-import com.openclassrooms.SafetyNetAlerts.model.PersonsDataFromStationDTO;
 import com.openclassrooms.SafetyNetAlerts.service.FireStationService;
 import com.openclassrooms.SafetyNetAlerts.service.MedicalRecordService;
 import com.openclassrooms.SafetyNetAlerts.service.PersonService;
@@ -53,21 +47,21 @@ public class FireStationIT {
 	
 	@BeforeEach
 	void resetTests() {
-		PersonService.initRepo();
+		PersonService.initRepo("src/main/resources/dataTEST.json");
 
-		FireStationService.initRepo();
+		FireStationService.initRepo("src/main/resources/dataTEST.json");
 		
-		RecordService.initRepo();
+		RecordService.initRepo("src/main/resources/dataTEST.json");
 		RecordService.updatePersonMedicalRecords();
 	}
 	
 	@AfterAll
 	void cleanUp() {
-		PersonService.initRepo();
+		PersonService.initRepo("src/main/resources/dataTEST.json");
 
-		FireStationService.initRepo();
+		FireStationService.initRepo("src/main/resources/dataTEST.json");
 		
-		RecordService.initRepo();
+		RecordService.initRepo("src/main/resources/dataTEST.json");
 		RecordService.updatePersonMedicalRecords();
 	}
 	
@@ -132,14 +126,12 @@ public class FireStationIT {
 			.andReturn();
 		
 		String Response = mvcResult.getResponse().getContentAsString();
-		String ResultAdultsCount = JsonPath.parse(Response).read("$.adults");
-		String ResultChildrenCount= JsonPath.parse(Response).read("$.children");
+		int ResultAdultsCount = (int) JsonPath.parse(Response).read("$.adults");
+		int ResultChildrenCount= (int) JsonPath.parse(Response).read("$.children");
 		
-		PersonsDataFromStationDTO ExpectedData = FireStationService.getPersonDTOFromStationNumber("2");
-		String ExpectedAdultsCount = ExpectedData.getAdults();
-		String ExpectedChildrenCount = ExpectedData.getChildren();
+		int ExpectedAdultsCount = 4;
+		int ExpectedChildrenCount = 1;
 		
-		// Test: Same number of adults and children when using URL and using service directly
 		assertEquals(ExpectedAdultsCount, ResultAdultsCount);
 		assertEquals(ExpectedChildrenCount, ResultChildrenCount);
 	}
@@ -160,16 +152,14 @@ public class FireStationIT {
 		String Response = mvcResult.getResponse().getContentAsString();
 		String ResultPersonLastName = JsonPath.parse(Response).read("$[0].lastName");
 		String ResultPersonPhone = JsonPath.parse(Response).read("$[0].phone");
-		String ResultPersonAge = JsonPath.parse(Response).read("$[0].age");
+		int ResultPersonAge = (int) JsonPath.parse(Response).read("$[0].age");
 		String ResultPersonStation = JsonPath.parse(Response).read("$[0].stationNumber");
 		
-		List<PersonDataFromAddressDTO> ExpectedList = FireStationService.getPersonDTOFromAddress("892 Downing Ct");
-		String ExpectedPersonLastName = ExpectedList.get(0).getLastName();
-		String ExpectedPersonPhone = ExpectedList.get(0).getPhone();
-		String ExpectedPersonAge = ExpectedList.get(0).getAge();
-		String ExpectedPersonStation = ExpectedList.get(0).getStationNumber();
+		String ExpectedPersonLastName = "Zemicks";
+		String ExpectedPersonPhone = "841-874-7878";
+		int ExpectedPersonAge = 37;
+		String ExpectedPersonStation = "2";
 		
-		// Test: Same data for the first person DTO gotten from URL and from Service
 		assertEquals(ExpectedPersonLastName, ResultPersonLastName);
 		assertEquals(ExpectedPersonPhone, ResultPersonPhone);
 		assertEquals(ExpectedPersonAge, ResultPersonAge);
@@ -193,26 +183,14 @@ public class FireStationIT {
 		String ResultAddress1 = JsonPath.parse(Response).read("$[0].address");
 		String ResultAddress2 = JsonPath.parse(Response).read("$[1].address");
 		String ResultAddress3 = JsonPath.parse(Response).read("$[2].address");
-		String ResultAddress4 = JsonPath.parse(Response).read("$[3].address");
-		String ResultAddress5 = JsonPath.parse(Response).read("$[4].address");
 		
-		List<String> StationNumbers = new ArrayList<String>();
-		StationNumbers.add("1");
-		StationNumbers.add("4");
+		String ExpectedAddress1 = "644 Gershwin Cir";
+		String ExpectedAddress2 = "908 73rd St";
+		String ExpectedAddress3 = "947 E. Rose Dr";
 		
-		List<HouseholdFromStationsDTO> ExpectedList = FireStationService.getHouseholdDTOFromStations(StationNumbers);
-		String ExpectedAddress1 = ExpectedList.get(0).getAddress();
-		String ExpectedAddress2 = ExpectedList.get(1).getAddress();
-		String ExpectedAddress3 = ExpectedList.get(2).getAddress();
-		String ExpectedAddress4 = ExpectedList.get(3).getAddress();
-		String ExpectedAddress5 = ExpectedList.get(4).getAddress();
-		
-		// Test: There are 5 households handled by stations 1 and 4; we check their addresses (URL vs Service)
 		assertEquals(ExpectedAddress1, ResultAddress1);
 		assertEquals(ExpectedAddress2, ResultAddress2);
 		assertEquals(ExpectedAddress3, ResultAddress3);
-		assertEquals(ExpectedAddress4, ResultAddress4);
-		assertEquals(ExpectedAddress5, ResultAddress5);
 	}
 	
 	@Test

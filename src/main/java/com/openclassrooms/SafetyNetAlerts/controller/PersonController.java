@@ -18,6 +18,9 @@ import com.openclassrooms.SafetyNetAlerts.model.Person;
 import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromLastNameDTO;
 import com.openclassrooms.SafetyNetAlerts.service.PersonService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
 public class PersonController {
 	@Autowired
@@ -30,44 +33,93 @@ public class PersonController {
 
 	@GetMapping("/person")
 	public ResponseEntity<List<Person>> getPersons() {
-		return new ResponseEntity<>(service.getPersons(), HttpStatus.OK);
+		try {
+			log.info("'GET/person' endpoint requested.");
+			return new ResponseEntity<>(service.getPersons(), HttpStatus.OK);
+		} catch (Exception e) {
+			log.error(e.toString());
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@PostMapping("/person")
 	public ResponseEntity<HttpStatus> addPerson(@RequestBody Person person) {
-		service.addPerson(person);
-		return ResponseEntity.ok(HttpStatus.OK);
+		try {
+			log.info("'POST/person' endpoint requested.");
+			service.addPerson(person);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (Exception e) {
+			log.error(e.toString());
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@PutMapping("/person")
 	public ResponseEntity<HttpStatus> modifyPerson(@RequestBody Person person) {
-		service.modifyPerson(person);
-		return ResponseEntity.ok(HttpStatus.OK);
+		try {
+			log.info("'PUT/person' endpoint requested.");
+			service.modifyPerson(person);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (Exception e) {
+			log.error(e.toString());
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@DeleteMapping("/person")
 	public ResponseEntity<HttpStatus> deletePerson(@RequestParam String firstName, @RequestParam String lastName) {
-		service.deletePerson(firstName, lastName);
-		return ResponseEntity.ok(HttpStatus.OK);
+		try {
+			log.info("'DELETE/person' endpoint requested.");
+			service.deletePerson(firstName, lastName);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (Exception e) {
+			log.error(e.toString());
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@GetMapping("/childAlert")
 	public ResponseEntity<List<ChildDataFromAddressDTO>> getChildrenFromAddress(@RequestParam String address) {
-		return new ResponseEntity<>(service.getChildrenFromAddress(address), HttpStatus.OK);
+		try {
+			log.info("'/childAlert' endpoint requested.");
+			return new ResponseEntity<>(service.getChildrenFromAddress(address), HttpStatus.OK);
+		} catch (Exception e) {
+			log.error(e.toString());
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@GetMapping("/phoneAlert")
 	public ResponseEntity<List<String>> getPhonesFromStationNumber(@RequestParam String firestation) {
-		return new ResponseEntity<>(service.getPhonesFromStationNumber(firestation), HttpStatus.OK);
+		try {
+			log.info("'/phoneAlert' endpoint requested.");
+			return new ResponseEntity<>(service.getPhonesFromStationNumber(firestation), HttpStatus.OK);
+		} catch (Exception e) {
+			log.error(e.toString());
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@GetMapping("/personInfo")
 	public ResponseEntity<List<PersonDataFromLastNameDTO>> getPersonInfo(@RequestParam String lastName) {
-		return new ResponseEntity<>(service.getPersonInfo(lastName), HttpStatus.OK);
+		try {
+			log.info("'/personInfo' endpoint requested.");
+			return new ResponseEntity<>(service.getPersonInfo(lastName), HttpStatus.OK);
+		} catch (Exception e) {
+			log.error(e.toString());
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
 	}
 	
 	@GetMapping("/communityEmail")
 	public ResponseEntity<List<String>> getCommunityEmail(@RequestParam String city) {
-		return new ResponseEntity<>(service.getPersonEmailsFromCity(city), HttpStatus.OK);
+		try {
+			log.info("'/communityEmail' endpoint requested.");
+			return new ResponseEntity<>(service.getPersonEmailsFromCity(city), HttpStatus.OK);
+		} catch (Exception e) {
+			log.error(e.toString());
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

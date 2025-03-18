@@ -44,25 +44,25 @@ public class MedicalRecordServiceTest {
     }
 	
 	@Test
-	void testGetMedicalRecordsAsService() {
+	void testGetMedicalRecordsAsService() throws Exception {
 		service.getMedicalRecords();
 		verify(MedicalRepo, Mockito.times(1)).getMedicalRecords();
 	}
 	
 	@Test
-	void testAddPersonAsService() {
+	void testAddPersonAsService() throws Exception {
 		service.addMedicalRecord(new MedicalRecord());
 		verify(MedicalRepo, Mockito.times(1)).addMedicalRecord(any(MedicalRecord.class));
 	}
 	
 	@Test
-	void testModifyPersonAsService() {
+	void testModifyPersonAsService() throws Exception {
 		service.modifyMedicalRecord(new MedicalRecord());
 		verify(MedicalRepo, Mockito.times(1)).modifyMedicalRecord(any(MedicalRecord.class));
 	}
 	
 	@Test
-	void testDeletePersonAsService() {
+	void testDeletePersonAsService() throws Exception {
 		service.deleteMedicalRecord("Daddy", "Daddy");
 		verify(MedicalRepo, Mockito.times(1)).deleteMedicalRecord(any(String.class), any(String.class));
 	}

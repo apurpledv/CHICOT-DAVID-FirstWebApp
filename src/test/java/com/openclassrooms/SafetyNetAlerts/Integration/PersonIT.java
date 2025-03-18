@@ -16,8 +16,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
@@ -25,9 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import com.jayway.jsonpath.JsonPath;
-import com.openclassrooms.SafetyNetAlerts.model.ChildDataFromAddressDTO;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
-import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromLastNameDTO;
 import com.openclassrooms.SafetyNetAlerts.service.MedicalRecordService;
 import com.openclassrooms.SafetyNetAlerts.service.PersonService;
 import com.openclassrooms.SafetyNetAlerts.service.FireStationService;
@@ -51,21 +47,21 @@ class PersonIT {
 	
 	@BeforeEach
 	void resetTests() {
-		PersonService.initRepo();
+		PersonService.initRepo("src/main/resources/dataTEST.json");
 
 		FireStationService.initRepo();
 		
-		RecordService.initRepo();
+		RecordService.initRepo("src/main/resources/dataTEST.json");
 		RecordService.updatePersonMedicalRecords();
 	}
 	
 	@AfterAll
 	void cleanUp() {
-		PersonService.initRepo();
+		PersonService.initRepo("src/main/resources/dataTEST.json");
 
-		FireStationService.initRepo();
+		FireStationService.initRepo("src/main/resources/dataTEST.json");
 		
-		RecordService.initRepo();
+		RecordService.initRepo("src/main/resources/dataTEST.json");
 		RecordService.updatePersonMedicalRecords();
 	}
 	
@@ -80,9 +76,8 @@ class PersonIT {
 		String ResultPersonFirstName = JsonPath.parse(Response).read("$[0].firstName");
 		String ResultPersonLastName = JsonPath.parse(Response).read("$[0].lastName");
 
-		List<Person> PersonsList = PersonService.getPersons();
-		String ExpectedFirstName = PersonsList.get(0).getFirstName();
-		String ExpectedLastName = PersonsList.get(0).getLastName();
+		String ExpectedFirstName = "John";
+		String ExpectedLastName = "Boyd";
 		
 		assertEquals(ExpectedFirstName, ResultPersonFirstName);
 		assertEquals(ExpectedLastName, ResultPersonLastName);
@@ -104,9 +99,9 @@ class PersonIT {
 			.content(BodyContent)
 		).andExpect(status().isOk());
 		
-		// Test: the person "Boba Fett" should exist, "Bob Bett" shouldn't
+		// Test: the person "Boba Fett" should exist, "Bob Betty" shouldn't
 		assertFalse(PersonService.getPerson("Boba", "Fett") == null);
-		assertTrue(PersonService.getPerson("Boba", "Bett") == null);
+		assertTrue(PersonService.getPerson("Boba", "Betty") == null);
 	}
 	
 	@Test
@@ -160,14 +155,12 @@ class PersonIT {
 		String Response = mvcResult.getResponse().getContentAsString();
 		String ResultPersonFirstName = JsonPath.parse(Response).read("$[0].firstName");
 		String ResultPersonLastName = JsonPath.parse(Response).read("$[0].lastName");
-		String ResultPersonAge = JsonPath.parse(Response).read("$[0].age");
+		int ResultPersonAge = (int) JsonPath.parse(Response).read("$[0].age");
 		
-		List<ChildDataFromAddressDTO> PersonsList = PersonService.getChildrenFromAddress("1509 Culver St");
-		String ExpectedFirstName = PersonsList.get(0).getFirstName();
-		String ExpectedLastName = PersonsList.get(0).getLastName();
-		String ExpectedAge = PersonsList.get(0).getAge();
+		String ExpectedFirstName = "Tenley";
+		String ExpectedLastName = "Boyd";
+		int ExpectedAge = 13;
 		
-		// Test: The first child found at this address is the same as the one found through our service 
 		assertEquals(ExpectedFirstName, ResultPersonFirstName);
 		assertEquals(ExpectedLastName, ResultPersonLastName);
 		assertEquals(ExpectedAge, ResultPersonAge);
@@ -189,10 +182,8 @@ class PersonIT {
 		String Response = mvcResult.getResponse().getContentAsString();
 		String ResultFirstPhone = JsonPath.parse(Response).read("$[0]");
 		
-		List<String> ExpectedPhones = PersonService.getPhonesFromStationNumber("1");
-		String ExpectedFirstPhone = ExpectedPhones.get(0);
+		String ExpectedFirstPhone = "841-874-6512";
 		
-		// Test: The first phone found is the same as the first one found using our service
 		assertEquals(ExpectedFirstPhone, ResultFirstPhone);
 	}
 	
@@ -211,15 +202,13 @@ class PersonIT {
 		
 		String Response = mvcResult.getResponse().getContentAsString();
 		String ResultPersonLastName = JsonPath.parse(Response).read("$[0].lastName");
-		String ResultPersonAge = JsonPath.parse(Response).read("$[0].age");
+		int ResultPersonAge = (int) JsonPath.parse(Response).read("$[0].age");
 		String ResultPersonEmail = JsonPath.parse(Response).read("$[0].email");
 		
-		List<PersonDataFromLastNameDTO> ExpectedPersonInfoList = PersonService.getPersonInfo("Boyd");
-		String ExpectedPersonInfoLastName = ExpectedPersonInfoList.get(0).getLastName();
-		String ExpectedPersonInfoAge = ExpectedPersonInfoList.get(0).getAge();
-		String ExpectedPersonInfoEmail = ExpectedPersonInfoList.get(0).getEmail();
+		String ExpectedPersonInfoLastName = "Boyd";
+		int ExpectedPersonInfoAge = 41;
+		String ExpectedPersonInfoEmail = "jaboyd@email.com";
 		
-		// Test: The first data fetched corresponds to the first one retrieved with our service
 		assertEquals(ExpectedPersonInfoLastName, ResultPersonLastName);
 		assertEquals(ExpectedPersonInfoAge, ResultPersonAge);
 		assertEquals(ExpectedPersonInfoEmail, ResultPersonEmail);
@@ -241,10 +230,8 @@ class PersonIT {
 		String Response = mvcResult.getResponse().getContentAsString();
 		String ResultFirstEmail = JsonPath.parse(Response).read("$[0]");
 		
-		List<String> ExpectedEmails = PersonService.getPersonEmailsFromCity("Culver");
-		String ExpectedFirstEmail = ExpectedEmails.get(0);
+		String ExpectedFirstEmail = "jaboyd@email.com";
 		
-		// Test: The first email found is the same as the first one found using our service
 		assertEquals(ExpectedFirstEmail, ResultFirstEmail);
 	}
 	

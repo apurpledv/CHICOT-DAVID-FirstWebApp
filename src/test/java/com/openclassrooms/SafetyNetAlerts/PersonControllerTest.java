@@ -35,7 +35,7 @@ public class PersonControllerTest {
 	PersonService service;
 	
 	@BeforeEach 
-    void resetTests() {
+    void resetTests() throws Exception {
 		when(service.getPersons()).thenReturn(new ArrayList<Person>());
     }
 	
@@ -46,6 +46,14 @@ public class PersonControllerTest {
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
 		verify(service, Mockito.times(1)).getPersons();
+	}
+	
+	@Test
+	public void testGetPersonsThrowsException() throws Exception {
+		Mockito.doThrow(new Exception()).when(service).getPersons();
+		
+		this.mockMvc.perform(get("/person"))
+			.andExpect(status().isInternalServerError());
 	}
 	
 	@Test
@@ -61,6 +69,18 @@ public class PersonControllerTest {
 	}
 	
 	@Test
+	public void testAddPersonThrowsException() throws Exception {
+		Mockito.doThrow(new Exception()).when(service).addPerson(any(Person.class));
+		
+		String fakeBodyContent = "{\"firstName\": \"Boba\", \"lastName\": \"Fett\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
+		
+		this.mockMvc.perform(post("/person")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(fakeBodyContent)
+		).andExpect(status().isInternalServerError());
+	}
+	
+	@Test
 	public void testModifyPerson() throws Exception {
 		String bodyContent = "{\"firstName\": \"John\", \"lastName\": \"Boyd\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
 		
@@ -73,6 +93,18 @@ public class PersonControllerTest {
 	}
 	
 	@Test
+	public void testModifyPersonThrowsException() throws Exception {
+		Mockito.doThrow(new Exception()).when(service).modifyPerson(any(Person.class));
+		
+		String bodyContent = "{\"firstName\": \"John\", \"lastName\": \"Boyd\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
+		
+		this.mockMvc.perform(put("/person")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(bodyContent)
+		).andExpect(status().isInternalServerError());
+	}
+	
+	@Test
 	public void testDeletePerson() throws Exception {
 		this.mockMvc.perform(delete("/person?firstName=John&lastName=Boyd"))
 			.andExpect(status().isOk());
@@ -81,10 +113,28 @@ public class PersonControllerTest {
 	}
 	
 	@Test
+	public void testDeletePersonThrowsException() throws Exception {
+		Mockito.doThrow(new Exception()).when(service).deletePerson(any(String.class), any(String.class));
+		
+		this.mockMvc.perform(delete("/person?firstName=John&lastName=Boyd"))
+			.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
 	public void testChildAlert() throws Exception {
 		this.mockMvc.perform(get("/childAlert?address=1509 Culver St"))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+		verify(service, Mockito.times(1)).getChildrenFromAddress(any(String.class));
+	}
+	
+	@Test
+	public void testChildAlertThrowsException() throws Exception {
+		Mockito.doThrow(new Exception()).when(service).getChildrenFromAddress(any(String.class));
+		
+		this.mockMvc.perform(get("/childAlert?address=1509 Culver St"))
+			.andExpect(status().isInternalServerError());
 
 		verify(service, Mockito.times(1)).getChildrenFromAddress(any(String.class));
 	}
@@ -107,6 +157,16 @@ public class PersonControllerTest {
 	}
 	
 	@Test
+	public void testPhoneAlertThrowsException() throws Exception {
+		Mockito.doThrow(new Exception()).when(service).getPhonesFromStationNumber(any(String.class));
+		
+		this.mockMvc.perform(get("/phoneAlert?firestation=1"))
+			.andExpect(status().isInternalServerError());
+		
+		verify(service, Mockito.times(1)).getPhonesFromStationNumber(any(String.class));
+	}
+	
+	@Test
 	public void testPhoneAlertNonValid() throws Exception {
 		this.mockMvc.perform(get("/phoneAlert"))
 			.andExpect(status().isBadRequest());
@@ -122,6 +182,14 @@ public class PersonControllerTest {
 	}
 	
 	@Test
+	public void testPersonInfoThrowsException() throws Exception {
+		Mockito.doThrow(new Exception()).when(service).getPersonInfo(any(String.class));
+		
+		this.mockMvc.perform(get("/personInfo?lastName=Boyd"))
+			.andExpect(status().isInternalServerError());
+	}
+	
+	@Test
 	public void testPersonInfoNonValid() throws Exception {
 		this.mockMvc.perform(get("/personInfo")).andExpect(status().isBadRequest());
 		
@@ -133,6 +201,14 @@ public class PersonControllerTest {
 		this.mockMvc.perform(get("/communityEmail?city=Culver")).andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
 		verify(service, Mockito.times(1)).getPersonEmailsFromCity(any(String.class));
+	}
+	
+	@Test
+	public void testCommunityEmailThrowsException() throws Exception {
+		Mockito.doThrow(new Exception()).when(service).getPersonEmailsFromCity(any(String.class));
+		
+		this.mockMvc.perform(get("/communityEmail?city=Culver"))
+			.andExpect(status().isInternalServerError());
 	}
 	
 	@Test

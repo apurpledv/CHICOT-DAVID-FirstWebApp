@@ -10,8 +10,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,16 +35,16 @@ public class MedicalRecordIT {
 	private MockMvc mockMvc;
 	
 	@Autowired
-	MedicalRecordService service;
+	MedicalRecordService RecordService;
 	
 	@BeforeEach
 	void resetTests() {
-		service.initRepo();
+		RecordService.initRepo("src/main/resources/dataTEST.json");
 	}
 	
 	@AfterAll
 	void cleanUp() {
-		service.initRepo();
+		RecordService.initRepo("src/main/resources/dataTEST.json");
 	}
 	
 	@Test
@@ -59,13 +57,15 @@ public class MedicalRecordIT {
 		String Response = mvcResult.getResponse().getContentAsString();
 		String ResultRecordFirstName = JsonPath.parse(Response).read("$[0].firstName");
 		String ResultRecordLastName = JsonPath.parse(Response).read("$[0].lastName");
+		String ResultRecordBirthDate = JsonPath.parse(Response).read("$[0].birthdate");
 		
-		List<MedicalRecord> RecordsList = service.getMedicalRecords();
-		String ExpectedFirstName = RecordsList.get(0).getFirstName();
-		String ExpectedLastName = RecordsList.get(0).getLastName();
+		String ExpectedFirstName = "John";
+		String ExpectedLastName = "Boyd";
+		String ExpectedBirthDate = "03/06/1984";
 		
 		assertEquals(ExpectedFirstName, ResultRecordFirstName);
 		assertEquals(ExpectedLastName, ResultRecordLastName);
+		assertEquals(ExpectedBirthDate, ResultRecordBirthDate);
 	}
 	
 	@Test
@@ -83,14 +83,14 @@ public class MedicalRecordIT {
 		).andExpect(status().isOk());
 		
 		// Test: the record for "Bob Bipp" should exist, the one for "Bob Bippppppp" shouldn't
-		assertFalse(service.getMedicalRecord("Bob", "Bipp") == null);
-		assertTrue(service.getMedicalRecord("Bob", "Bippppppp") == null);
+		assertFalse(RecordService.getMedicalRecord("Bob", "Bipp") == null);
+		assertTrue(RecordService.getMedicalRecord("Bob", "Bippppppp") == null);
 	}
 	
 	@Test
 	public void testModifyMedicalRecordIT() throws Exception {
 		// The medications and allergies aren't empty
-		MedicalRecord RecordToChange = service.getMedicalRecord("John", "Boyd");
+		MedicalRecord RecordToChange = RecordService.getMedicalRecord("John", "Boyd");
 		assertFalse(RecordToChange.getMedications().isEmpty());
 		assertFalse(RecordToChange.getAllergies().isEmpty());
 
@@ -115,7 +115,7 @@ public class MedicalRecordIT {
 	@Test
 	public void testDeleteMedicalRecordIT() throws Exception {
 		// The medications and allergies aren't empty
-		MedicalRecord RecordToDelete = service.getMedicalRecord("John", "Boyd");
+		MedicalRecord RecordToDelete = RecordService.getMedicalRecord("John", "Boyd");
 		assertFalse(RecordToDelete == null);
 		
 		// We delete this record
@@ -123,7 +123,7 @@ public class MedicalRecordIT {
 			.andExpect(status().isOk());
 		
 		// Test: the record should be null (doesn't exist anymore)
-		MedicalRecord RecordDeleted = service.getMedicalRecord("John", "Boyd");
+		MedicalRecord RecordDeleted = RecordService.getMedicalRecord("John", "Boyd");
 		assertTrue(RecordDeleted == null);
 	}
 }

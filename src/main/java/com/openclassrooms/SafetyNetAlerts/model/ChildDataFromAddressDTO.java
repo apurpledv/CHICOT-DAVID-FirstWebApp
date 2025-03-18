@@ -8,10 +8,10 @@ import lombok.Data;
 public class ChildDataFromAddressDTO {
 	private String firstName;
 	private String lastName;
-	private String age;
+	private int age;
 	private List<Person> otherMembers;
 	
-	public ChildDataFromAddressDTO(String firstName, String lastName, String age, List<Person> otherMembers) {
+	public ChildDataFromAddressDTO(String firstName, String lastName, int age, List<Person> otherMembers) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.age = age;

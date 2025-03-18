@@ -8,12 +8,12 @@ import lombok.Data;
 public class PersonDataFromLastNameDTO {
 	private String lastName;
 	private String address;
-	private String age;
+	private int age;
 	private String email;
 	private List<String> medication;
 	private List<String> allergies;
 	
-	public PersonDataFromLastNameDTO(String lastName, String address, String age, String email, List<String> medication, List<String> allergies) {
+	public PersonDataFromLastNameDTO(String lastName, String address, int age, String email, List<String> medication, List<String> allergies) {
 		this.lastName = lastName;
 		this.address = address;
 		this.age = age;

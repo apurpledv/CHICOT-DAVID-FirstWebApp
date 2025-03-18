@@ -38,31 +38,31 @@ public class FireStationService {
 		FireRepo.initRepo();
 	}
 	
-	public List<FireStation> getFireStations() {
+	public void initRepo(String fileName) {
+		FireRepo.initRepo(fileName);
+	}
+	
+	public List<FireStation> getFireStations() throws Exception {
 		return FireRepo.getFireStations();
 	}
 	
-	public FireStation getFireStation(String address, String station) {
+	public FireStation getFireStation(String address, String station) throws Exception {
 		return FireRepo.getFireStation(address, station);
 	}
 	
-	public void addFireStation(FireStation station) {
-		log.debug("Adding Station: " + station);
+	public void addFireStation(FireStation station) throws Exception {
 		FireRepo.addFireStation(station);
 	}
 	
-	public void modifyFireStation(FireStation station) {
-		log.debug("Modifying Station: " + station);
+	public void modifyFireStation(FireStation station) throws Exception {
 		FireRepo.modifyFireStation(station);
 	}
 	
-	public void deleteFireStation(String address, String station) {
-		log.debug("Deleting Station at address: " + address);
+	public void deleteFireStation(String address, String station) throws Exception {
 		FireRepo.deleteFireStation(address, station);
 	}
 	
-	public List<PersonDataFromAddressDTO> getPersonDTOFromAddress(String address) {
-		log.debug("Fetching Persons Data From Address: " + address);
+	public List<PersonDataFromAddressDTO> getPersonDTOFromAddress(String address) throws Exception {
 		List<PersonDataFromAddressDTO> ListDTO = new ArrayList<PersonDataFromAddressDTO>();
 		
 		List<Person> personsList = PersonRepo.getPersons();
@@ -73,16 +73,13 @@ public class FireStationService {
 		    	ListDTO.add(DTOmapper.toPersonDataFromAddressDto(person, stationNumber));
 		    }
 		}
-		
-		if (ListDTO.isEmpty())
-			log.info("No Person found at this address: " + address);
+
+		log.debug("Number of results: " + ListDTO.size());
 		
 		return ListDTO;
 	}
 	
-	public PersonsDataFromStationDTO getPersonDTOFromStationNumber(String stationNumber) {
-		log.debug("Fetching Persons Data From Station Number: " + stationNumber);
-		
+	public PersonsDataFromStationDTO getPersonDTOFromStationNumber(String stationNumber) throws Exception {
 		List<PersonFromStationNumberDTO> personsDTO = new ArrayList<PersonFromStationNumberDTO>();
 		List<String> Addresses = new ArrayList<String>();
 		
@@ -103,16 +100,13 @@ public class FireStationService {
 				personsDTO.add(DTOmapper.toPersonFromStationDto(personAtAddress));
 			}
 		}
+
+		log.debug("Number of results: " + personsDTO.size());
 		
-		if (personsDTO.isEmpty())
-			log.info("No Person found that is handled by Station: " + stationNumber);
-		
-		return DTOmapper.toPersonsDataFromStationNumberDto(String.valueOf(adults), String.valueOf(children), personsDTO);	
+		return DTOmapper.toPersonsDataFromStationNumberDto(adults, children, personsDTO);	
 	}
 	
-	public List<HouseholdFromStationsDTO> getHouseholdDTOFromStations(List<String> stations) {
-		log.debug("Fetching Data Of Households Handled By Stations: " + stations);
-		
+	public List<HouseholdFromStationsDTO> getHouseholdDTOFromStations(List<String> stations) throws Exception {
 		List<HouseholdFromStationsDTO> ListDTO = new ArrayList<HouseholdFromStationsDTO>();
 
 		List<String> HouseHoldAddresses = new ArrayList<String>();
@@ -130,9 +124,8 @@ public class FireStationService {
 			
 			ListDTO.add(DTOmapper.toHouseholdFromStationsDto(address, personsDTO));
 		}
-		
-		if (ListDTO.isEmpty())
-			log.info("No Households found for Stations: " + stations);
+
+		log.debug("Number of results: " + ListDTO.size());
 		
 		return ListDTO;	
 	}
