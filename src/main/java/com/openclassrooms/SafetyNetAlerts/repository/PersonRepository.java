@@ -13,8 +13,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
+import com.openclassrooms.SafetyNetAlerts.util.PersonAlreadyExistsException;
 
 import lombok.extern.slf4j.Slf4j;
+
+/**
+ * PersonRepository is the entity that will manipulate all the data related to Persons
+ */
 
 @Slf4j
 @Component
@@ -26,10 +31,17 @@ public class PersonRepository {
 	
 	private List<Person> PersonsList = new ArrayList<Person>();
 	
+	/**
+	 * Will initiate the data parsing upon being constructed
+	 */
 	public PersonRepository() {
 		initRepo();
 	}
 	
+	/**
+	 * <p>Will read an entire file and turn it into a String</p>
+	 * @param fileName the path to the file
+	 */
  	public void getJSONFromFile(String fileName) {
 		// Get access to the file
 		try {
@@ -44,11 +56,12 @@ public class PersonRepository {
 			log.error(e.toString());
 		}
 	}
- 	
- 	public void initRepo() {
- 		initRepo(this.FileName);
- 	}
 	
+ 	/**
+ 	 * <p>Will parse a given file to find every Person (in the 'persons' array of the file)
+ 	 * and map it to a List of Persons</p>
+ 	 * @param fileName the path to the JSON file
+ 	 */
 	public void initRepo(String fileName) {
 		// Get JSON from the file as exploitable data
 		getJSONFromFile(fileName);
@@ -60,7 +73,21 @@ public class PersonRepository {
 			log.error(e.toString());
 		}
 	}
+	
+	/**
+ 	 * <p>Will parse a given file (by default: FileName = "src/main/resources/data.json") to find every Person
+ 	 * and map it to a List of Person Object Objects</p>
+ 	 */
+ 	public void initRepo() {
+ 		initRepo(this.FileName);
+ 	}
 
+ 	/**
+ 	 * <p>Will loop the List of Persons to find a specific one</p>
+ 	 * @param firstName of the person
+ 	 * @param lastName of the person
+ 	 * @return a Person Object if found; null if none is found
+ 	 */
 	public Person getPerson(String firstName, String lastName) {
 		Person personFound = null;
 		for (Person person : PersonsList) {
@@ -72,17 +99,36 @@ public class PersonRepository {
 		return personFound;
 	}
 	
+	/**
+	 * <p>Will return the List of Person Objects</p>
+	 * @return a List of Person Objects
+	 */
 	public List<Person> getPersons() {
 		return PersonsList;
 	}
 	
-	public void addPerson(Person person) {
-		PersonsList.add(person);
+	/**
+	 * <p>Will add a Person Object to the PersonsList List</p>
+	 * @param personToAdd a Person Object to be added
+	 * @return a boolean of the method List.add()
+	 * @throws Exception if a person with the same first and last names (check Person.equals(Person) method), 
+	 * will throw an Exception
+	 */
+	public boolean addPerson(Person personToAdd) throws Exception {
+		for (Person person : PersonsList) {
+		    if (personToAdd.equals(person))
+		    	throw new PersonAlreadyExistsException("This person already exists.");
+		}
 		
-		log.debug("Person added successfully.");
+		return PersonsList.add(personToAdd);
 	}
 	
-	public void modifyPerson(Person personToChange) {
+	/**
+	 * <p>Will loop through PersonsList, identify the Person using firstName and lastName, and modify its attributes</p>
+	 * @param personToChange a Person Object containing the new attributes
+	 * @return true if the Person is found and successfully modified; false otherwise
+	 */
+	public boolean modifyPerson(Person personToChange) {
 		for (Person person : PersonsList) {
 		    if (personToChange.equals(person)) {
 	    		person.setAddress(personToChange.getAddress());
@@ -90,24 +136,34 @@ public class PersonRepository {
 	    		person.setZip(personToChange.getZip());
 	    		person.setPhone(personToChange.getPhone());
 	    		person.setEmail(personToChange.getEmail());
-		    	break;
+	    		return true;
 		    }
 		}
-		
-		log.debug("Person modified successfully.");
+		return false;
 	}
 	
-	public void deletePerson(String firstName, String lastName) {
+	/**
+	 * <p>Will delete a given Person from PersonsList</p>
+	 * @param firstName of the Person to delete
+	 * @param lastName of the Person to delete
+	 * @return true if the Person is found and successfully deleted; false otherwise
+	 */
+	public boolean deletePerson(String firstName, String lastName) {
 		for (Person person : PersonsList) {
 		    if (person.getFirstName().equals(firstName) && person.getLastName().equals(lastName)) {
 		    	PersonsList.remove(person);
-		    	break;
+		    	
+		    	return true;
 		    }
 		}
-		
-		log.debug("Person deleted successfully.");
+		return false;
 	}
 	
+	/**
+	 * <p>Will retrieve the email addresses of every Person associated with a given City</p>
+	 * @param cityName name of the City to parse from
+	 * @return a List of the email addresses found
+	 */
 	public List<String> getPersonEmailsFromCity(String cityName) {
 		List<String> ListOfPersonsFromCity = new ArrayList<String>();
 		for (Person person : PersonsList) {
@@ -117,6 +173,11 @@ public class PersonRepository {
 		return ListOfPersonsFromCity;
 	}
 	
+	/**
+	 * <p>Will retrieve the Persons living at a specific Address</p>
+	 * @param address to parse from
+	 * @return a List of the Persons found at this address
+	 */
 	public List<Person> getPersonsFromAddress(String address) {
 		List<Person> ListOfPersonsFromAddress = new ArrayList<Person>();
 		for (Person person : PersonsList) {

@@ -1,5 +1,7 @@
 package com.openclassrooms.SafetyNetAlerts;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,8 +47,10 @@ public class MedicalRecordServiceTest {
 	
 	@Test
 	void testGetMedicalRecordsAsService() throws Exception {
-		service.getMedicalRecords();
-		verify(MedicalRepo, Mockito.times(1)).getMedicalRecords();
+		List<MedicalRecord> RecordsList = service.getMedicalRecords();
+		
+		assertFalse(RecordsList.isEmpty());
+		assertEquals("Daddy", RecordsList.get(0).getFirstName());
 	}
 	
 	@Test
@@ -56,13 +60,13 @@ public class MedicalRecordServiceTest {
 	}
 	
 	@Test
-	void testModifyPersonAsService() throws Exception {
+	void testModifyPersonAsService() {
 		service.modifyMedicalRecord(new MedicalRecord());
 		verify(MedicalRepo, Mockito.times(1)).modifyMedicalRecord(any(MedicalRecord.class));
 	}
 	
 	@Test
-	void testDeletePersonAsService() throws Exception {
+	void testDeletePersonAsService() {
 		service.deleteMedicalRecord("Daddy", "Daddy");
 		verify(MedicalRepo, Mockito.times(1)).deleteMedicalRecord(any(String.class), any(String.class));
 	}

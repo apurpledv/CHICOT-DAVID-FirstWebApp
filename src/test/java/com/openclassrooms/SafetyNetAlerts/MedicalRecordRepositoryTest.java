@@ -2,6 +2,8 @@ package com.openclassrooms.SafetyNetAlerts;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -15,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.repository.MedicalRecordRepository;
+import com.openclassrooms.SafetyNetAlerts.util.MedicalRecordAlreadyExistsException;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -49,7 +52,7 @@ public class MedicalRecordRepositoryTest {
 	}
 	
 	@Test
-	void testAddMedicalRecordAsRepo() {
+	void testAddMedicalRecordAsRepo() throws Exception {
 		MedicalRecord NewRecord = new MedicalRecord();
 		NewRecord.setFirstName("Daddy");
 		NewRecord.setLastName("Daddy");
@@ -61,6 +64,23 @@ public class MedicalRecordRepositoryTest {
 	}
 	
 	@Test
+	void testAddMedicalRecordAsRepoNonValid() throws Exception {
+		MedicalRecord A = new MedicalRecord();
+		A.setFirstName("Daddy");
+		A.setLastName("Daddy");
+		A.setBirthdate("11/11/2012");
+		
+		MedicalRecord B = new MedicalRecord();
+		B.setFirstName("Daddy");
+		B.setLastName("Daddy");
+		B.setBirthdate("11/11/2012");
+		
+		MedicalRecordRepo.addMedicalRecord(A);
+		
+		assertThrows(MedicalRecordAlreadyExistsException.class, () -> MedicalRecordRepo.addMedicalRecord(B));
+	}
+	
+	@Test
 	void testModifyMedicalRecordAsRepo() {
 		MedicalRecord RecordToModify = new MedicalRecord();
 		
@@ -68,18 +88,36 @@ public class MedicalRecordRepositoryTest {
 		RecordToModify.setLastName("Boyd");
 		RecordToModify.setBirthdate("09/09/2009");
 		
-		MedicalRecordRepo.modifyMedicalRecord(RecordToModify);
+		boolean Result = MedicalRecordRepo.modifyMedicalRecord(RecordToModify);
+		assertTrue(Result);
 		
 		assertEquals("09/09/2009", MedicalRecordRepo.getMedicalRecord("John", "Boyd").getBirthdate());
+	}
+	
+	@Test
+	void testModifyMedicalRecordAsRepoNonValid() {
+		MedicalRecord UnknownRecord = new MedicalRecord();
+		UnknownRecord.setFirstName("");
+		UnknownRecord.setLastName("");
+		
+		boolean Result = MedicalRecordRepo.modifyMedicalRecord(UnknownRecord);
+		assertFalse(Result);
 	}
 
 	@Test
 	void testDeleteMedicalRecordAsRepo() {
-		MedicalRecordRepo.deleteMedicalRecord("John", "Boyd");
+		boolean Result = MedicalRecordRepo.deleteMedicalRecord("John", "Boyd");
+		assertTrue(Result);
 		
 		assertEquals(null, MedicalRecordRepo.getMedicalRecord("John", "Boyd"));
 		
 		// This one still exists, thus it shouldn't be null
 		assertFalse(MedicalRecordRepo.getMedicalRecord("Jacob", "Boyd") == null);
+	}
+	
+	@Test
+	void testDeleteMedicalRecordAsRepoNonValid() {
+		boolean Result = MedicalRecordRepo.deleteMedicalRecord("", "");
+		assertFalse(Result);
 	}
 }

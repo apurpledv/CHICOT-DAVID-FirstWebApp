@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.service.MedicalRecordService;
+import com.openclassrooms.SafetyNetAlerts.util.MedicalRecordAlreadyExistsException;
 import com.openclassrooms.SafetyNetAlerts.util.SNAUtil;
 
 @SpringBootTest
@@ -58,55 +59,92 @@ public class MedicalRecordControllerTest {
 	}
 	
 	@Test
-	public void testAddPerson() throws Exception {
-		String fakeBodyContent = "{\"firstName\": \"Boba\", \"lastName\": \"Fett\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
+	public void testAddMedicalRecord() throws Exception {
+		when(service.addMedicalRecord(any(MedicalRecord.class))).thenReturn(true);
+		
+		String BodyContent = "{\"firstName\": \"Moby\", \"lastName\": \"Dick\", \"birthdate\": \"01/01/1999\"}";
 		
 		this.mockMvc.perform(post("/medicalRecord")
 			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
-			.content(fakeBodyContent)
+			.content(BodyContent)
 		).andExpect(status().isOk());
-		
-		verify(service, Mockito.times(1)).addMedicalRecord(any(MedicalRecord.class));
 	}
 	
 	@Test
-	public void testAddPersonThrowsException() throws Exception {
+	public void testAddRecordNonValid() throws Exception {
+		String GoodBodyContent = "{\"firstName\": \"Moby\", \"lastName\": \"Dick\", \"birthdate\": \"01/01/1999\"}";
+		String BadBodyContent = "{\"firstName\": \"Boba\"}";
+		
+		// TEST#1 - Problem with service (returns false when adding)
+		when(service.addMedicalRecord(any(MedicalRecord.class))).thenReturn(false);
+		
+		this.mockMvc.perform(post("/medicalRecord")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(GoodBodyContent)
+		).andExpect(status().isInternalServerError());
+		
+		// TEST#2 - Bad body
+		when(service.addMedicalRecord(any(MedicalRecord.class))).thenReturn(true);
+		
+		this.mockMvc.perform(post("/medicalRecord")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(BadBodyContent)
+		).andExpect(status().isBadRequest());
+		
+		// TEST#3 - MedicalRecordAlreadyExistsException occurs when adding
+		Mockito.doThrow(new MedicalRecordAlreadyExistsException()).when(service).addMedicalRecord(any(MedicalRecord.class));
+		
+		this.mockMvc.perform(post("/medicalRecord")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(GoodBodyContent)
+		).andExpect(status().isBadRequest());
+		
+		// TEST#4 - Exception occurs when adding
 		Mockito.doThrow(new Exception()).when(service).addMedicalRecord(any(MedicalRecord.class));
-		
-		String fakeBodyContent = "{\"firstName\": \"Boba\", \"lastName\": \"Fett\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
-		
+
 		this.mockMvc.perform(post("/medicalRecord")
 			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
-			.content(fakeBodyContent)
+			.content(GoodBodyContent)
 		).andExpect(status().isInternalServerError());
 	}
 	
 	@Test
-	public void testModifyPerson() throws Exception {
-		String bodyContent = "{\"firstName\": \"John\", \"lastName\": \"Boyd\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
+	public void testModifyRecord() throws Exception {
+		when(service.modifyMedicalRecord(any(MedicalRecord.class))).thenReturn(true);
+		
+		String BodyContent = "{\"firstName\": \"Moby\", \"lastName\": \"Dick\", \"birthdate\": \"01/01/1999\"}";
 		
 		this.mockMvc.perform(put("/medicalRecord")
 			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
-			.content(bodyContent)
+			.content(BodyContent)
 		).andExpect(status().isOk());
-
-		verify(service, Mockito.times(1)).modifyMedicalRecord(any(MedicalRecord.class));
 	}
 	
 	@Test
-	public void testModifyPersonThrowsException() throws Exception {
-		Mockito.doThrow(new Exception()).when(service).modifyMedicalRecord(any(MedicalRecord.class));
-		
-		String bodyContent = "{\"firstName\": \"John\", \"lastName\": \"Boyd\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
+	public void testModifyRecordNonValid() throws Exception {
+		// TEST#1 - Missing one required attribute in the body's MedicalRecord (birthdate)
+		String BadBodyContent = "{\"firstName\": \"Moby\", \"lastName\": \"Dick\"}";
 		
 		this.mockMvc.perform(put("/medicalRecord")
 			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
-			.content(bodyContent)
+			.content(BadBodyContent)
+		).andExpect(status().isBadRequest());
+		
+		// TEST#2 - Error in service (some problem with the service or repository, returns false)
+		String GoodBodyContent = "{\"firstName\": \"Moby\", \"lastName\": \"Dick\", \"birthdate\": \"01/01/1999\"}";
+		
+		when(service.modifyMedicalRecord(any(MedicalRecord.class))).thenReturn(false);
+		
+		this.mockMvc.perform(put("/medicalRecord")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(GoodBodyContent)
 		).andExpect(status().isInternalServerError());
 	}
 	
 	@Test
-	public void testDeletePerson() throws Exception {
+	public void testDeleteRecord() throws Exception {
+		when(service.deleteMedicalRecord(any(String.class), any(String.class))).thenReturn(true);
+		
 		this.mockMvc.perform(delete("/medicalRecord?recordFirstName=John&recordLastName=Boyd"))
 			.andExpect(status().isOk());
 		
@@ -114,10 +152,18 @@ public class MedicalRecordControllerTest {
 	}
 	
 	@Test
-	public void testDeletePersonThrowsException() throws Exception {
-		Mockito.doThrow(new Exception()).when(service).deleteMedicalRecord(any(String.class), any(String.class));
+	public void testDeleteRecordNonValid() throws Exception {
+		// TEST#1 - Bad arguments
+		this.mockMvc.perform(delete("/medicalRecord?recordLastName=Boyd"))
+			.andExpect(status().isBadRequest());
+		
+		this.mockMvc.perform(delete("/medicalRecord?recordFirstName=John"))
+			.andExpect(status().isBadRequest());
+		
+		// TEST#2 - Error in service (some problem with the service or repository, returns false)
+		when(service.deleteMedicalRecord(any(String.class), any(String.class))).thenReturn(false);
 		
 		this.mockMvc.perform(delete("/medicalRecord?recordFirstName=John&recordLastName=Boyd"))
-			.andExpect(status().isInternalServerError());
+			.andExpect(status().isInternalServerError());	
 	}
 }

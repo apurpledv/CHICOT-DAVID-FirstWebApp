@@ -17,9 +17,13 @@ import com.openclassrooms.SafetyNetAlerts.model.ChildDataFromAddressDTO;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromLastNameDTO;
 import com.openclassrooms.SafetyNetAlerts.service.PersonService;
+import com.openclassrooms.SafetyNetAlerts.util.PersonAlreadyExistsException;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * PersonController is an entity that handles every URL/Endpoint linked to Persons (adding, modifying, deleting, ...)
+ */
 @Slf4j
 @Controller
 public class PersonController {
@@ -31,95 +35,146 @@ public class PersonController {
 		// code here
     }
 
+	
 	@GetMapping("/person")
 	public ResponseEntity<List<Person>> getPersons() {
+		ResponseEntity<List<Person>> Response = null;
+		
 		try {
-			log.info("'GET/person' endpoint requested.");
-			return new ResponseEntity<>(service.getPersons(), HttpStatus.OK);
+			Response = new ResponseEntity<>(service.getPersons(), HttpStatus.OK);
+			log.info("[POST] /person - " + String.valueOf(Response.getStatusCode()));
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[GET] /person - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@PostMapping("/person")
 	public ResponseEntity<HttpStatus> addPerson(@RequestBody Person person) {
+		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
+		
 		try {
-			log.info("'POST/person' endpoint requested.");
-			service.addPerson(person);
-			return new ResponseEntity<>(HttpStatus.OK);
+			if (!person.IsValid()) {
+				Response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				log.error("[POST] /person - " + String.valueOf(Response.getStatusCode()));
+			} else {
+				boolean Result = service.addPerson(person);
+				if (Result == false)
+					throw new Exception("Could not add person");
+				
+				log.info("[POST] /person - " + String.valueOf(Response.getStatusCode()));
+			}
+		} catch (PersonAlreadyExistsException e) {
+			Response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			log.error("[POST] /person - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[POST] /person - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@PutMapping("/person")
 	public ResponseEntity<HttpStatus> modifyPerson(@RequestBody Person person) {
+		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
+		
 		try {
-			log.info("'PUT/person' endpoint requested.");
-			service.modifyPerson(person);
-			return new ResponseEntity<>(HttpStatus.OK);
+			if (!person.IsValid()) {
+				Response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				log.error("[PUT] /person - " + String.valueOf(Response.getStatusCode()));
+			} else {
+				boolean Result = service.modifyPerson(person);
+				if (Result == false)
+					throw new Exception("Could not modify person");
+				
+				log.info("[PUT] /person - " + String.valueOf(Response.getStatusCode()));
+			}
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[PUT] /person - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@DeleteMapping("/person")
 	public ResponseEntity<HttpStatus> deletePerson(@RequestParam String firstName, @RequestParam String lastName) {
+		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
+		
 		try {
-			log.info("'DELETE/person' endpoint requested.");
-			service.deletePerson(firstName, lastName);
-			return new ResponseEntity<>(HttpStatus.OK);
+			boolean Result = service.deletePerson(firstName, lastName);
+			if (Result == false)
+				throw new Exception("Could not delete person");
+			
+			log.info("[DELETE] /person - " + String.valueOf(Response.getStatusCode()));
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[DELETE] /person - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@GetMapping("/childAlert")
 	public ResponseEntity<List<ChildDataFromAddressDTO>> getChildrenFromAddress(@RequestParam String address) {
+		ResponseEntity<List<ChildDataFromAddressDTO>> Response = null;
+		
 		try {
-			log.info("'/childAlert' endpoint requested.");
-			return new ResponseEntity<>(service.getChildrenFromAddress(address), HttpStatus.OK);
+			Response = new ResponseEntity<>(service.getChildrenFromAddress(address), HttpStatus.OK);
+			log.info("[GET] /childAlert - " + String.valueOf(Response.getStatusCode()));
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[GET] /childAlert - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@GetMapping("/phoneAlert")
 	public ResponseEntity<List<String>> getPhonesFromStationNumber(@RequestParam String firestation) {
+		ResponseEntity<List<String>> Response = null;
+		
 		try {
-			log.info("'/phoneAlert' endpoint requested.");
-			return new ResponseEntity<>(service.getPhonesFromStationNumber(firestation), HttpStatus.OK);
+			Response = new ResponseEntity<>(service.getPhonesFromStationNumber(firestation), HttpStatus.OK);
+			log.info("[GET] /phoneAlert - " + String.valueOf(Response.getStatusCode()));
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[GET] /phoneAlert - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@GetMapping("/personInfo")
 	public ResponseEntity<List<PersonDataFromLastNameDTO>> getPersonInfo(@RequestParam String lastName) {
+		ResponseEntity<List<PersonDataFromLastNameDTO>> Response = null;
+		
 		try {
-			log.info("'/personInfo' endpoint requested.");
-			return new ResponseEntity<>(service.getPersonInfo(lastName), HttpStatus.OK);
+			Response = new ResponseEntity<>(service.getPersonInfo(lastName), HttpStatus.OK);
+			log.info("[GET] /personInfo - " + String.valueOf(Response.getStatusCode()));
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[GET] /personInfo - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
 		
+		return Response;
 	}
 	
 	@GetMapping("/communityEmail")
 	public ResponseEntity<List<String>> getCommunityEmail(@RequestParam String city) {
+		ResponseEntity<List<String>> Response = null;
+		
 		try {
-			log.info("'/communityEmail' endpoint requested.");
-			return new ResponseEntity<>(service.getPersonEmailsFromCity(city), HttpStatus.OK);
+			Response = new ResponseEntity<>(service.getPersonEmailsFromCity(city), HttpStatus.OK);
+			log.info("[GET] /communityEmail - " + String.valueOf(Response.getStatusCode()));
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[GET] /communityEmail - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 }

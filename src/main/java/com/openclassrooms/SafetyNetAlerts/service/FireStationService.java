@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
 import com.openclassrooms.SafetyNetAlerts.model.HouseholdFromStationsDTO;
 import com.openclassrooms.SafetyNetAlerts.model.Mapper;
+import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromAddressDTO;
 import com.openclassrooms.SafetyNetAlerts.model.PersonFromHouseholdDTO;
@@ -16,6 +17,7 @@ import com.openclassrooms.SafetyNetAlerts.model.PersonFromStationNumberDTO;
 import com.openclassrooms.SafetyNetAlerts.model.PersonsDataFromStationDTO;
 import com.openclassrooms.SafetyNetAlerts.repository.FireStationRepository;
 import com.openclassrooms.SafetyNetAlerts.repository.PersonRepository;
+import com.openclassrooms.SafetyNetAlerts.util.MedicalRecordNotFoundException;
 import com.openclassrooms.SafetyNetAlerts.util.SNAUtil;
 
 import lombok.Data;
@@ -46,20 +48,20 @@ public class FireStationService {
 		return FireRepo.getFireStations();
 	}
 	
-	public FireStation getFireStation(String address, String station) throws Exception {
+	public FireStation getFireStation(String address, String station) {
 		return FireRepo.getFireStation(address, station);
 	}
 	
-	public void addFireStation(FireStation station) throws Exception {
-		FireRepo.addFireStation(station);
+	public boolean addFireStation(FireStation station) throws Exception {
+		return FireRepo.addFireStation(station);
 	}
 	
-	public void modifyFireStation(FireStation station) throws Exception {
-		FireRepo.modifyFireStation(station);
+	public boolean modifyFireStation(FireStation station) {
+		return FireRepo.modifyFireStation(station);
 	}
 	
-	public void deleteFireStation(String address, String station) throws Exception {
-		FireRepo.deleteFireStation(address, station);
+	public boolean deleteFireStation(String address, String station) {
+		return FireRepo.deleteFireStation(address, station);
 	}
 	
 	public List<PersonDataFromAddressDTO> getPersonDTOFromAddress(String address) throws Exception {
@@ -91,8 +93,12 @@ public class FireStationService {
 		for (String address: Addresses) {
 			List<Person> personsPerAddress = PersonRepo.getPersonsFromAddress(address);
 			for (Person personAtAddress: personsPerAddress) {
+				MedicalRecord Record = personAtAddress.getRecord();
+				if (Record == null)
+					throw new MedicalRecordNotFoundException();
+				
 				// We count how many adults/children we have in total
-				if (SNAUtil.getAge(personAtAddress.getRecord().getBirthdate()) > 18)
+				if (SNAUtil.getAge(Record.getBirthdate()) > SNAUtil.MAJORITY_AGE)
 					adults++;
 				else
 					children++;

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.service.MedicalRecordService;
+import com.openclassrooms.SafetyNetAlerts.util.MedicalRecordAlreadyExistsException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,48 +27,83 @@ public class MedicalRecordController {
 	
 	@GetMapping("/medicalRecord")
 	public ResponseEntity<List<MedicalRecord>> getMedicalRecords() {
+		ResponseEntity<List<MedicalRecord>> Response = null;
+		
 		try {
-			log.info("'GET/medicalRecord' endpoint requested.");
-			return new ResponseEntity<>(service.getMedicalRecords(), HttpStatus.OK);
+			Response = new ResponseEntity<>(service.getMedicalRecords(), HttpStatus.OK);
+			log.info("[GET] /medicalRecord - " + String.valueOf(Response.getStatusCode()));
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[GET] /medicalRecord - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@PostMapping("/medicalRecord")
 	public ResponseEntity<HttpStatus> addMedicalRecord(@RequestBody MedicalRecord record) {
+		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
+		
 		try {
-			log.info("'POST/medicalRecord' endpoint requested.");
-			service.addMedicalRecord(record);
-			return new ResponseEntity<>(HttpStatus.OK);
+			if (!record.IsValid()) {
+				Response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				log.error("[POST] /medicalRecord - " + String.valueOf(Response.getStatusCode()));
+			} else {
+				boolean Result = service.addMedicalRecord(record);
+				if (Result == false)
+					throw new Exception("Could not add person");
+				
+				log.info("[POST] /medicalRecord - " + String.valueOf(Response.getStatusCode()));
+			}
+		} catch (MedicalRecordAlreadyExistsException e) {
+			Response = new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+			log.error("[POST] /medicalRecord - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[POST] /medicalRecord - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@PutMapping("/medicalRecord")
 	public ResponseEntity<HttpStatus> modifyMedicalRecord(@RequestBody MedicalRecord record) {
+		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
+		
 		try {
-			log.info("'PUT/medicalRecord' endpoint requested.");
-			service.modifyMedicalRecord(record);
-			return new ResponseEntity<>(HttpStatus.OK);
+			if (!record.IsValid()) {
+				Response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				log.error("[PUT] /medicalRecord - " + String.valueOf(Response.getStatusCode()));
+			} else {
+				boolean Result = service.modifyMedicalRecord(record);
+				if (Result == false)
+					throw new Exception("Could not modify Record");
+				
+				log.info("[PUT] /medicalRecord - " + String.valueOf(Response.getStatusCode()));
+			}
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[PUT] /medicalRecord - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@DeleteMapping("/medicalRecord")
 	public ResponseEntity<HttpStatus> deleteMedicalRecord(@RequestParam String recordFirstName, @RequestParam String recordLastName) {
+		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
+		
 		try {
-			log.info("'DELETE/medicalRecord' endpoint requested.");
-			service.deleteMedicalRecord(recordFirstName, recordLastName);
-			return new ResponseEntity<>(HttpStatus.OK);
+			boolean Result = service.deleteMedicalRecord(recordFirstName, recordLastName);
+			if (Result == false)
+				throw new Exception("Could not delete Record");
+				
+			log.info("[DELETE] /medicalRecord - " + String.valueOf(Response.getStatusCode()));
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[DELETE] /medicalRecord - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 }

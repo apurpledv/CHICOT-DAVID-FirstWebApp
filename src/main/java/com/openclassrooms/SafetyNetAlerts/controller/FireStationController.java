@@ -18,6 +18,7 @@ import com.openclassrooms.SafetyNetAlerts.model.HouseholdFromStationsDTO;
 import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromAddressDTO;
 import com.openclassrooms.SafetyNetAlerts.model.PersonsDataFromStationDTO;
 import com.openclassrooms.SafetyNetAlerts.service.FireStationService;
+import com.openclassrooms.SafetyNetAlerts.util.FireStationAlreadyExistsException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,70 +30,113 @@ public class FireStationController {
 	
 	@PostMapping("/firestation")
 	public ResponseEntity<HttpStatus> addFireStation(@RequestBody FireStation station) {
+		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
+		
 		try {
-			log.info("'POST/firestation' endpoint requested.");
-			service.addFireStation(station);
-			return new ResponseEntity<>(HttpStatus.OK);
+			if (!station.IsValid()) {
+				Response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				log.error("[POST] /firestation - " + String.valueOf(Response.getStatusCode()));
+			} else {
+				boolean Result = service.addFireStation(station);
+				if (Result == false)
+					throw new Exception("Could not add fire station");
+				
+				log.info("[POST] /firestation - " + String.valueOf(Response.getStatusCode()));
+			}
+		} catch (FireStationAlreadyExistsException e) {
+			Response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			log.error("[POST] /firestation - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[POST] /firestation - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@PutMapping("/firestation")
 	public ResponseEntity<HttpStatus> modifyFireStation(@RequestBody FireStation station) {
+		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
+
 		try {
-			log.info("'PUT/firestation' endpoint requested.");
-			service.modifyFireStation(station);
-			return new ResponseEntity<>(HttpStatus.OK);
+			if (!station.IsValid()) {
+				Response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				log.error("[PUT] /firestation - " + String.valueOf(Response.getStatusCode()));
+			} else {
+				boolean Result = service.modifyFireStation(station);
+				if (Result == false)
+					throw new Exception("Could not modify fire station");
+				
+				log.info("[PUT] /firestation - " + String.valueOf(Response.getStatusCode()));
+			}
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[PUT] /firestation - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@DeleteMapping("/firestation")
 	public ResponseEntity<HttpStatus> deleteFireStation(@RequestParam String address, @RequestParam String station) {
+		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
+		
 		try {
-			log.info("'DELETE/firestation' endpoint requested.");
-			service.deleteFireStation(address, station);
-			return new ResponseEntity<>(HttpStatus.OK);
+			boolean Result = service.deleteFireStation(address, station);
+			if (Result == false)
+				throw new Exception("Could not modify fire station");
+				
+			log.info("[DELETE] /firestation - " + String.valueOf(Response.getStatusCode()));
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[DELETE] /firestation - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@GetMapping("/firestation")
 	public ResponseEntity<PersonsDataFromStationDTO> getPersonDTOFromStationNumber(@RequestParam String stationNumber) {
+		ResponseEntity<PersonsDataFromStationDTO> Response = null;
+		
 		try {
-			log.info("'/firestation' endpoint requested.");
-			return new ResponseEntity<>(service.getPersonDTOFromStationNumber(stationNumber), HttpStatus.OK);
+			Response = new ResponseEntity<>(service.getPersonDTOFromStationNumber(stationNumber), HttpStatus.OK);
+			log.info("[GET] /firestation - " + String.valueOf(Response.getStatusCode()));
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[GET] /firestation - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@GetMapping("/fire")
 	public ResponseEntity<List<PersonDataFromAddressDTO>> getPersonDTOFromAddress(@RequestParam String address) {
+		ResponseEntity<List<PersonDataFromAddressDTO>> Response = null;
+		
 		try {
-			log.info("'/fire' endpoint requested.");
-			return new ResponseEntity<>(service.getPersonDTOFromAddress(address), HttpStatus.OK);
+			Response = new ResponseEntity<>(service.getPersonDTOFromAddress(address), HttpStatus.OK);
+			log.info("[GET] /fire - " + String.valueOf(Response.getStatusCode()));
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[GET] /fire - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 	
 	@GetMapping("/flood/stations")
 	public ResponseEntity<List<HouseholdFromStationsDTO>> getHouseholdDTOFromStations(@RequestParam List<String> stations) {
+		ResponseEntity<List<HouseholdFromStationsDTO>> Response = null;
+		
 		try {
-			log.info("'/flood/stations' endpoint requested.");
-			return new ResponseEntity<>(service.getHouseholdDTOFromStations(stations), HttpStatus.OK);
+			Response = new ResponseEntity<>(service.getHouseholdDTOFromStations(stations), HttpStatus.OK);
+			log.info("[GET] /flood/stations - " + String.valueOf(Response.getStatusCode()));
 		} catch (Exception e) {
-			log.error(e.toString());
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[GET] /flood/stations - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		}
+		
+		return Response;
 	}
 }

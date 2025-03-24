@@ -19,11 +19,17 @@ public class Person {
     }
 	
 	public boolean equals(Person personToCompare) {
-		boolean result = false;
-		
 		if (personToCompare.getFirstName().equals(this.firstName) && personToCompare.getLastName().equals(this.lastName))
-			result = true;
+			return true;
 		
-		return result;
+		return false;
+	}
+	
+	public boolean IsValid() {
+		if (this.firstName == null || this.firstName.isEmpty() || this.lastName == null || this.lastName.isEmpty() || this.address == null || this.address.isEmpty() || this.city == null || this.city.isEmpty() || this.zip == null || this.zip.isEmpty() || this.email == null || this.email.isEmpty() || this.phone == null || this.phone.isEmpty()) {
+			return false;
+		} else {
+			return true; 
+		}
 	}
 }

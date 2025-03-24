@@ -2,6 +2,7 @@ package com.openclassrooms.SafetyNetAlerts;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
 import com.openclassrooms.SafetyNetAlerts.repository.FireStationRepository;
+import com.openclassrooms.SafetyNetAlerts.util.FireStationAlreadyExistsException;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -56,7 +58,7 @@ public class FireStationRepositoryTest {
 	}
 	
 	@Test
-	void testAddStationAsRepo() {
+	void testAddStationAsRepo() throws Exception {
 		FireStation NewStation = new FireStation();
 		NewStation.setAddress("Do");
 		NewStation.setStation("1");
@@ -68,12 +70,29 @@ public class FireStationRepositoryTest {
 	}
 	
 	@Test
+	void testAddStationAsRepoNonValid() throws Exception {
+		FireStation A = new FireStation();
+		A.setAddress("A");
+		A.setStation("A");
+		
+		FireStation B = new FireStation();
+		B.setAddress("A");
+		B.setStation("A");
+		
+		FireStationRepo.addFireStation(A);
+
+		assertThrows(FireStationAlreadyExistsException.class, () -> FireStationRepo.addFireStation(B));
+	}
+	
+	@Test
 	void testModifyStationAsRepo() {
 		FireStation StationToModify = new FireStation();
 		StationToModify.setAddress("489 Manchester St");
 		StationToModify.setStation("1");
-		FireStationRepo.modifyFireStation(StationToModify);
-
+		
+		boolean Result = FireStationRepo.modifyFireStation(StationToModify);
+		assertTrue(Result);
+		
 		// The original one, "489 Manchester St, Station=4"
 		assertTrue(FireStationRepo.getFireStation("489 Manchester St", "4") == null);
 		// The new one, "489 Manchester St, Station=1"
@@ -81,11 +100,27 @@ public class FireStationRepositoryTest {
 	}
 	
 	@Test
+	void testModifyStationAsRepoNonValid() {
+		FireStation StationToModify = new FireStation();
+		StationToModify.setAddress("");
+		
+		boolean Result = FireStationRepo.modifyFireStation(StationToModify);
+		assertFalse(Result);
+	}
+	
+	@Test
 	void testDeleteStationAsRepo() {
-		FireStationRepo.deleteFireStation("489 Manchester St", "4");
+		boolean Result = FireStationRepo.deleteFireStation("489 Manchester St", "4");
+		assertTrue(Result);
 
 		// This station shouldn't exist anymore, and thus should return 'null'
 		assertTrue(FireStationRepo.getFireStation("489 Manchester St", "4") == null);
+	}
+	
+	@Test
+	void testDeleteStationAsRepoNonValid() {
+		boolean Result = FireStationRepo.deleteFireStation("", "");
+		assertFalse(Result);
 	}
 	
 	@Test

@@ -50,28 +50,28 @@ public class MedicalRecordService {
 		return RecordRepo.getMedicalRecords();
 	}
 	
-	public MedicalRecord getMedicalRecord(String firstName, String lastName) throws Exception {
+	public MedicalRecord getMedicalRecord(String firstName, String lastName) {
 		return RecordRepo.getMedicalRecord(firstName, lastName);
 	}
 	
-	public void addMedicalRecord(MedicalRecord record) throws Exception {
-		RecordRepo.addMedicalRecord(record);
+	public boolean addMedicalRecord(MedicalRecord record) throws Exception {
+		boolean Success = RecordRepo.addMedicalRecord(record);
 		updatePersonMedicalRecords();
 		
-		log.debug("Record added successfully.");
+		return Success;
 	}
 	
-	public void modifyMedicalRecord(MedicalRecord record) throws Exception {
-		RecordRepo.modifyMedicalRecord(record);
+	public boolean modifyMedicalRecord(MedicalRecord record) {
+		boolean Success = RecordRepo.modifyMedicalRecord(record);
 		updatePersonMedicalRecords();
-		
-		log.debug("Record modified successfully.");
+
+		return Success;
 	}
 	
-	public void deleteMedicalRecord(String recordFirstName, String recordLastName) throws Exception {
-		RecordRepo.deleteMedicalRecord(recordFirstName, recordLastName);
+	public boolean deleteMedicalRecord(String recordFirstName, String recordLastName) {
+		boolean Success = RecordRepo.deleteMedicalRecord(recordFirstName, recordLastName);
 		updatePersonMedicalRecords();
 		
-		log.debug("Record deleted successfully.");
+		return Success;
 	}
 }

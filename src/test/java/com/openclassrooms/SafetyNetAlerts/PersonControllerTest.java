@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 import com.openclassrooms.SafetyNetAlerts.service.PersonService;
+import com.openclassrooms.SafetyNetAlerts.util.PersonAlreadyExistsException;
 import com.openclassrooms.SafetyNetAlerts.util.SNAUtil;
 
 @SpringBootTest
@@ -58,6 +59,8 @@ public class PersonControllerTest {
 	
 	@Test
 	public void testAddPerson() throws Exception {
+		when(service.addPerson(any(Person.class))).thenReturn(true);
+		
 		String fakeBodyContent = "{\"firstName\": \"Boba\", \"lastName\": \"Fett\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
 		
 		this.mockMvc.perform(post("/person")
@@ -69,19 +72,46 @@ public class PersonControllerTest {
 	}
 	
 	@Test
-	public void testAddPersonThrowsException() throws Exception {
-		Mockito.doThrow(new Exception()).when(service).addPerson(any(Person.class));
-		
-		String fakeBodyContent = "{\"firstName\": \"Boba\", \"lastName\": \"Fett\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
+	public void testAddPersonNonValid() throws Exception {
+		// TEST#1 - Bad Body (the Person object is invalid)
+		String BadBodyContent = "{\"firstName\": \"Boba\"}";
 		
 		this.mockMvc.perform(post("/person")
 			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
-			.content(fakeBodyContent)
+			.content(BadBodyContent)
+		).andExpect(status().isBadRequest());
+		
+		// TEST#2 - Error in service (some problem with the service or repository, returns false)
+		when(service.addPerson(any(Person.class))).thenReturn(false);
+		
+		String GoodBodyContent = "{\"firstName\": \"John\", \"lastName\": \"Boyd\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
+		
+		this.mockMvc.perform(post("/person")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(GoodBodyContent)
+		).andExpect(status().isInternalServerError());
+		
+		// TEST#3 - PersonAlreadyExistsException thrown from service
+		Mockito.doThrow(new PersonAlreadyExistsException()).when(service).addPerson(any(Person.class));
+		
+		this.mockMvc.perform(post("/person")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(GoodBodyContent)
+		).andExpect(status().isBadRequest());
+		
+		// TEST#4 - Exception thrown from service
+		Mockito.doThrow(new Exception()).when(service).addPerson(any(Person.class));
+		
+		this.mockMvc.perform(post("/person")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(GoodBodyContent)
 		).andExpect(status().isInternalServerError());
 	}
 	
 	@Test
 	public void testModifyPerson() throws Exception {
+		when(service.modifyPerson(any(Person.class))).thenReturn(true);
+		
 		String bodyContent = "{\"firstName\": \"John\", \"lastName\": \"Boyd\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
 		
 		this.mockMvc.perform(put("/person")
@@ -93,19 +123,30 @@ public class PersonControllerTest {
 	}
 	
 	@Test
-	public void testModifyPersonThrowsException() throws Exception {
-		Mockito.doThrow(new Exception()).when(service).modifyPerson(any(Person.class));
-		
-		String bodyContent = "{\"firstName\": \"John\", \"lastName\": \"Boyd\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
+	public void testModifyPersonNonValid() throws Exception {
+		// TEST#1 - Bad Body (the Person object is invalid)
+		String BadBodyContent = "{}";
 		
 		this.mockMvc.perform(put("/person")
 			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
-			.content(bodyContent)
+			.content(BadBodyContent)
+		).andExpect(status().isBadRequest());
+		
+		// TEST#2 - Error in service (some problem with the service or repository, returns false)
+		when(service.modifyPerson(any(Person.class))).thenReturn(false);
+		
+		String GoodBodyContent = "{\"firstName\": \"John\", \"lastName\": \"Boyd\", \"address\": \"1 Road of Tatooine\", \"city\": \"Parisley\", \"zip\": \"+99\", \"phone\": \"0606060606\", \"email\": \"bobaFett@gmail.com\"}";
+		
+		this.mockMvc.perform(put("/person")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(GoodBodyContent)
 		).andExpect(status().isInternalServerError());
 	}
 	
 	@Test
 	public void testDeletePerson() throws Exception {
+		when(service.deletePerson(any(String.class), any(String.class))).thenReturn(true);
+		
 		this.mockMvc.perform(delete("/person?firstName=John&lastName=Boyd"))
 			.andExpect(status().isOk());
 		
@@ -113,8 +154,19 @@ public class PersonControllerTest {
 	}
 	
 	@Test
-	public void testDeletePersonThrowsException() throws Exception {
-		Mockito.doThrow(new Exception()).when(service).deletePerson(any(String.class), any(String.class));
+	public void testDeletePersonNonValid() throws Exception {
+		// TEST#1 - Missing arguments
+		this.mockMvc.perform(delete("/person?"))
+			.andExpect(status().isBadRequest());
+		
+		this.mockMvc.perform(delete("/person?firstName=John"))
+			.andExpect(status().isBadRequest());
+		
+		this.mockMvc.perform(delete("/person?lastName=Boyd"))
+			.andExpect(status().isBadRequest());
+		
+		// TEST#2 - Error in service (some problem with the service or repository, returns false)
+		when(service.deletePerson(any(String.class), any(String.class))).thenReturn(false);
 		
 		this.mockMvc.perform(delete("/person?firstName=John&lastName=Boyd"))
 			.andExpect(status().isInternalServerError());

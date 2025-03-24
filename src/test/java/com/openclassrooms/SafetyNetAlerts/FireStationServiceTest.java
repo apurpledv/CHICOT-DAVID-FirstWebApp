@@ -1,5 +1,7 @@
 package com.openclassrooms.SafetyNetAlerts;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -17,11 +19,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
+import com.openclassrooms.SafetyNetAlerts.model.HouseholdFromStationsDTO;
 import com.openclassrooms.SafetyNetAlerts.model.Mapper;
 import com.openclassrooms.SafetyNetAlerts.model.MedicalRecord;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
+import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromAddressDTO;
 import com.openclassrooms.SafetyNetAlerts.model.PersonFromHouseholdDTO;
 import com.openclassrooms.SafetyNetAlerts.model.PersonFromStationNumberDTO;
+import com.openclassrooms.SafetyNetAlerts.model.PersonsDataFromStationDTO;
 import com.openclassrooms.SafetyNetAlerts.repository.FireStationRepository;
 import com.openclassrooms.SafetyNetAlerts.repository.PersonRepository;
 import com.openclassrooms.SafetyNetAlerts.service.FireStationService;
@@ -81,8 +86,12 @@ public class FireStationServiceTest {
 	
 	@Test
 	void testGetStationsAsService() throws Exception {
-		service.getFireStations();
-		verify(FireRepo, Mockito.times(1)).getFireStations();
+		List<FireStation> StationsList = service.getFireStations();
+		
+		assertFalse(StationsList.isEmpty());
+		assertEquals(2, StationsList.size());
+		assertEquals("Do", StationsList.get(0).getAddress());
+		assertEquals("1", StationsList.get(0).getStation());
 	}
 	
 	@Test
@@ -92,26 +101,28 @@ public class FireStationServiceTest {
 	}
 	
 	@Test
-	void testModifyStationAsService() throws Exception {
+	void testModifyStationAsService(){
 		service.modifyFireStation(new FireStation());
 		verify(FireRepo, Mockito.times(1)).modifyFireStation(any(FireStation.class));
 	}
 	
 	@Test
-	void testDeleteStationAsService() throws Exception {
+	void testDeleteStationAsService() {
 		service.deleteFireStation("Do", "1");
 		verify(FireRepo, Mockito.times(1)).deleteFireStation(any(String.class), any(String.class));
 	}
 	
 	@Test
 	void testGetPersonDTOFromAddressAsService() throws Exception {
+		PersonDataFromAddressDTO FakeDTO = new PersonDataFromAddressDTO("Daddy", null, 20, "1", null, null);
+		
 		when(FireRepo.getFireStationNumberFromAddress(any(String.class))).thenReturn("1");
+		when(mapper.toPersonDataFromAddressDto(any(Person.class), any(String.class))).thenReturn(FakeDTO);
 		
-		service.getPersonDTOFromAddress("Do");
+		List<PersonDataFromAddressDTO> DTOList = service.getPersonDTOFromAddress("Do");
 		
-		verify(PersonRepo, Mockito.times(1)).getPersons();
-		verify(FireRepo, Mockito.times(1)).getFireStationNumberFromAddress(any(String.class));
-		verify(mapper, Mockito.times(1)).toPersonDataFromAddressDto(any(Person.class), any(String.class));
+		assertFalse(DTOList.isEmpty());
+		assertEquals("Daddy", DTOList.get(0).getLastName());
 	}
 	
 	@Test
@@ -147,11 +158,15 @@ public class FireStationServiceTest {
 		);
 		FakePersonsDTOList.add(FakePersonDTO);
 		
+		// Mocking the 'toHouseholdFromStationsDto' to return a fake household DTO
+		HouseholdFromStationsDTO FakeHouseholdDTO = new HouseholdFromStationsDTO("Do", FakePersonsDTOList);
+		
 		// 'Whens'
 		when(FireRepo.getFireStationAddressesFromStationNumber(eq("1"))).thenReturn(FakeAddressesS1);
 		when(FireRepo.getFireStationAddressesFromStationNumber(eq("3"))).thenReturn(FakeAddressesS2);
 		when(PersonRepo.getPersonsFromAddress(eq("Do"))).thenReturn(FakePersonFromAddressList);
 		when(mapper.toPersonFromHouseholdDto(any(Person.class))).thenReturn(FakePersonDTO);
+		when(mapper.toHouseholdFromStationsDto(any(String.class), eq(FakePersonsDTOList))).thenReturn(FakeHouseholdDTO);
 		
 		
 		// Start of the test
@@ -159,12 +174,13 @@ public class FireStationServiceTest {
 		StationNumberList.add("1");
 		StationNumberList.add("3");
 		
-		service.getHouseholdDTOFromStations(StationNumberList);
+		List<HouseholdFromStationsDTO> HouseholdsList = service.getHouseholdDTOFromStations(StationNumberList);
+		assertFalse(HouseholdsList.isEmpty());
 		
-		verify(FireRepo, Mockito.times(2)).getFireStationAddressesFromStationNumber(any(String.class));
-		verify(PersonRepo, Mockito.times(2)).getPersonsFromAddress(any(String.class));
-		verify(mapper, Mockito.times(1)).toPersonFromHouseholdDto(any(Person.class));
-		verify(mapper, Mockito.times(1)).toHouseholdFromStationsDto(any(String.class), eq(FakePersonsDTOList));
+		PersonFromHouseholdDTO FirstOccupant = HouseholdsList.get(0).getOccupants().get(0);
+		assertEquals("Daddy", FirstOccupant.getLastName());
+		assertEquals("0101010101", FirstOccupant.getPhone());
+		assertEquals(14, FirstOccupant.getAge());
 	}
 	
 	@Test
@@ -204,19 +220,28 @@ public class FireStationServiceTest {
 		);
 		FakePersonsDTOList.add(FakePersonDTO);
 		
+		// Mocking the 'toPersonsDataFromStationNumberDto' to return a fake DTO
+		PersonsDataFromStationDTO FakePersonsDataDTO = new PersonsDataFromStationDTO(1, 0, FakePersonsDTOList);
+		
 		// 'Whens'
 		when(FireRepo.getFireStationAddressesFromStationNumber(eq("1"))).thenReturn(FakeAddresses);
 		when(PersonRepo.getPersonsFromAddress(eq("Do"))).thenReturn(FakePersonFromAddressList);
 		when(mapper.toPersonFromStationDto(any(Person.class))).thenReturn(FakePersonDTO);
+		when(mapper.toPersonsDataFromStationNumberDto(any(int.class), any(int.class), eq(FakePersonsDTOList))).thenReturn(FakePersonsDataDTO);
 		
 		
 		// Start of the test		
-		service.getPersonDTOFromStationNumber("1");
+		PersonsDataFromStationDTO PersonsDataDTO = service.getPersonDTOFromStationNumber("1");
+
+		assertFalse(PersonsDataDTO == null);
+		assertEquals(1, PersonsDataDTO.getAdults());
+		assertEquals(0, PersonsDataDTO.getChildren());
 		
-		verify(FireRepo, Mockito.times(1)).getFireStationAddressesFromStationNumber(any(String.class));
-		verify(PersonRepo, Mockito.times(1)).getPersonsFromAddress(any(String.class));
-		verify(mapper, Mockito.times(1)).toPersonFromStationDto(any(Person.class));
-		verify(mapper, Mockito.times(1)).toPersonsDataFromStationNumberDto(any(int.class), any(int.class), eq(FakePersonsDTOList));
+		PersonFromStationNumberDTO FirstPerson = PersonsDataDTO.getPersons().get(0);
+		assertEquals("Daddy", FirstPerson.getFirstName());
+		assertEquals("Daddy", FirstPerson.getLastName());
+		assertEquals("Do", FirstPerson.getAddress());
+		assertEquals("0101010101", FirstPerson.getPhone());
 	}
 	
 	@Test

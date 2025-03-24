@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.openclassrooms.SafetyNetAlerts.model.FireStation;
 import com.openclassrooms.SafetyNetAlerts.service.FireStationService;
+import com.openclassrooms.SafetyNetAlerts.util.FireStationAlreadyExistsException;
 import com.openclassrooms.SafetyNetAlerts.util.SNAUtil;
 
 @SpringBootTest
@@ -42,54 +43,90 @@ public class FireStationControllerTest {
 	
 	@Test
 	public void testAddFireStation() throws Exception {
-		String fakeBodyContent = "{}";
+		when(service.addFireStation(any(FireStation.class))).thenReturn(true);
+		
+		String BodyContent = "{\"address\": \"1 Rue De la Fett\", \"station\": \"99999\"}";
 		
 		this.mockMvc.perform(post("/firestation")
 			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
-			.content(fakeBodyContent)
+			.content(BodyContent)
 		).andExpect(status().isOk());
-		
-		verify(service, Mockito.times(1)).addFireStation(any(FireStation.class));
 	}
 	
 	@Test
-	public void testAddFireStationThrowsException() throws Exception {
-		Mockito.doThrow(new Exception()).when(service).addFireStation(any(FireStation.class));
+	public void testAddFireStationNonValid() throws Exception {
+		// TEST#1 - Bad Body (the FireStation object is invalid)
+		String BadBodyContent = "{}";
+				
+		this.mockMvc.perform(post("/firestation")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(BadBodyContent)
+		).andExpect(status().isBadRequest());
 		
-		String fakeBodyContent = "{}";
+		// TEST#2 - Error in service (some problem with the service or repository, returns false)
+		when(service.addFireStation(any(FireStation.class))).thenReturn(false);
+		
+		String GoodBodyContent = "{\"address\": \"1 Road De Tatooine\", \"station\": \"13\"}";
 		
 		this.mockMvc.perform(post("/firestation")
 			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
-			.content(fakeBodyContent)
+			.content(GoodBodyContent)
+		).andExpect(status().isInternalServerError());
+		
+		// TEST#3 - FireStationAlreadyExistsException thrown from service
+		Mockito.doThrow(new FireStationAlreadyExistsException()).when(service).addFireStation(any(FireStation.class));
+		
+		this.mockMvc.perform(post("/firestation")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(GoodBodyContent)
+		).andExpect(status().isBadRequest());
+		
+		// TEST#4 - Exception thrown from service
+		Mockito.doThrow(new Exception()).when(service).addFireStation(any(FireStation.class));
+		
+		this.mockMvc.perform(post("/firestation")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(GoodBodyContent)
 		).andExpect(status().isInternalServerError());
 	}
 	
 	@Test
 	public void testModifyFireStation() throws Exception {
-		String fakeBodyContent = "{}";
+		when(service.modifyFireStation(any(FireStation.class))).thenReturn(true);
+		
+		String GoodBodyContent = "{\"address\": \"1 Road De Tatooine\", \"station\": \"13\"}";
 		
 		this.mockMvc.perform(put("/firestation")
 			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
-			.content(fakeBodyContent)
+			.content(GoodBodyContent)
 		).andExpect(status().isOk());
-
-		verify(service, Mockito.times(1)).modifyFireStation(any(FireStation.class));
 	}
 	
 	@Test
-	public void testModifyFireStationThrowsException() throws Exception {
-		Mockito.doThrow(new Exception()).when(service).modifyFireStation(any(FireStation.class));
-		
-		String fakeBodyContent = "{}";
+	public void testModifyFireStationNonValid() throws Exception {
+		// TEST#1 - Bad Body (the FireStation object is invalid)
+		String BadBodyContent = "{\"address\": \"1 Road De Tatooine\"}";
 		
 		this.mockMvc.perform(put("/firestation")
 			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
-			.content(fakeBodyContent)
+			.content(BadBodyContent)
+		).andExpect(status().isBadRequest());
+		
+		// TEST#2 - Error in service (some problem with the service or repository, returns false)
+		when(service.modifyFireStation(any(FireStation.class))).thenReturn(false);
+		
+		String GoodBodyContent = "{\"address\": \"1 Road De Tatooine\", \"station\": \"13\"}";
+		
+		this.mockMvc.perform(put("/firestation")
+			.contentType(SNAUtil.APPLICATION_JSON_UTF8)
+			.content(GoodBodyContent)
 		).andExpect(status().isInternalServerError());
 	}
 	
 	@Test
 	public void testDeleteFireStation() throws Exception {
+		when(service.deleteFireStation(any(String.class), any(String.class))).thenReturn(true);
+		
 		this.mockMvc.perform(delete("/firestation?address=A&station=A"))
 			.andExpect(status().isOk());
 		
@@ -97,8 +134,16 @@ public class FireStationControllerTest {
 	}
 	
 	@Test
-	public void testDeleteFireStationThrowsException() throws Exception {
-		Mockito.doThrow(new Exception()).when(service).deleteFireStation(any(String.class), any(String.class));
+	public void testDeleteFireStationNonValid() throws Exception {
+		// TEST#1 - Missing arguments
+		this.mockMvc.perform(delete("/person?address=A"))
+			.andExpect(status().isBadRequest());
+		
+		this.mockMvc.perform(delete("/person?station=A"))
+			.andExpect(status().isBadRequest());
+		
+		// TEST#2 - Error in service (some problem with the service or repository, returns false)
+		when(service.deleteFireStation(any(String.class), any(String.class))).thenReturn(false);
 		
 		this.mockMvc.perform(delete("/firestation?address=A&station=A"))
 			.andExpect(status().isInternalServerError());
