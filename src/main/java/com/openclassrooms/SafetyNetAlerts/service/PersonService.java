@@ -21,6 +21,9 @@ import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromLastNameDTO;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * MedicalRecordService is an entity that handles the business work linked to Persons
+ */
 @Slf4j
 @Data
 @Service
@@ -37,38 +40,81 @@ public class PersonService {
 	@Autowired
 	Mapper DTOmapper;
 	
+	/**
+	 * Will manually order the loading of data from the default file from its repository
+	 */
 	public void initRepo() {
 		PersonRepo.initRepo();
 	}
 	
+	/**
+	 * Will manually order the loading of data from a custom file from its repository
+	 */
 	public void initRepo(String fileName) {
 		PersonRepo.initRepo(fileName);
 	}
 	
+	/**
+	 * <p>Will return a List of every Person Object registered</p>
+	 * @return a List of Person Objects
+	 */
 	public List<Person> getPersons() throws Exception {
 		return PersonRepo.getPersons();
 	}
 	
+	/**
+	 * <p>Will return a Person Object registered with that first and last name</p>
+	 * @param firstName of the person's MedicalRecord to find
+	 * @param lastName of the person's MedicalRecord to find
+	 * @return a Person Object
+	 */
 	public Person getPerson(String firstName, String lastName) {
 		return PersonRepo.getPerson(firstName, lastName);
 	}
 	
+	/**
+	 * Will attempt to add a Person Object to the Application
+	 * @param person the Person Object to add
+	 * @return true if successful; false otherwise
+	 * @throws Exception if a person with the same first and last names already exists, will throw an Exception
+	 */
 	public boolean addPerson(Person person) throws Exception {
 		return PersonRepo.addPerson(person);
 	}
 	
+	/**
+	 * <p>Will attempt to modify an already existing Person Object</p>
+	 * @param person a Person Object containing the new attributes
+	 * @return true if successful; false no person is found
+	 */
 	public boolean modifyPerson(Person person) {
 		return PersonRepo.modifyPerson(person);
 	}
 	
+	/**
+	 * <p>Will attempt to delete an already existing Person Object</p>
+	 * @param firstName of the Person to delete
+	 * @param lastName of the Person to delete
+	 * @return true if successful; false no person is found
+	 */
 	public boolean deletePerson(String firstName, String lastName) {
 		return PersonRepo.deletePerson(firstName, lastName);
 	}
 	
+	/**
+	 * <p>Will return a List of email addresses of Persons from a given City</p>
+	 * @param cityName city to parse from
+	 * @return a List of email addresses
+	 */
 	public List<String> getPersonEmailsFromCity(String cityName) throws Exception {
 		return PersonRepo.getPersonEmailsFromCity(cityName);
 	}
 	
+	/**
+	 * <p>Will return a List of the phone numbers of people covered by a given station (id'd by its station number)</p>
+	 * @param stationNumber number of the station
+	 * @return a List of phone numbers
+	 */
 	public List<String> getPhonesFromStationNumber(String stationNumber) throws Exception {
 		List<String> PhonesList = new ArrayList<String>();
 		List<FireStation> FireStationList = FireRepo.getFireStations();
@@ -87,6 +133,12 @@ public class PersonService {
 		return PhonesList;
 	}
 	
+	/**
+	 * <p>Will return a List of Person DTOs with information related to Person(s) with a specific last name</p>
+	 * @param lastName of the Person(s) to look for
+	 * @return a List of DTOs, each containing [lastName, address, age, email, medication, allergies]
+	 * @throws Exception if at any point, a Person doesn't have a MedicalRecord bound to them (==null), will throw an Exception
+	 */
 	public List<PersonDataFromLastNameDTO> getPersonInfo(String lastName) throws Exception {
 		List<PersonDataFromLastNameDTO> ListDTO = new ArrayList<PersonDataFromLastNameDTO>();
 		
@@ -103,6 +155,12 @@ public class PersonService {
 		return ListDTO;
 	}
 	
+	/**
+	 * <p>Will return a List of Person DTOs of every Child at a given address
+	 * @param address to parse persons from
+	 * @return a List of DTOs, each containing @return a DTO containing [firstName, lastName, age, otherMembers]
+	 * @throws Exception if at any point, a Person doesn't have a MedicalRecord bound to them (==null), will throw an Exception
+	 */
 	public List<ChildDataFromAddressDTO> getChildrenFromAddress(String address) throws Exception {
 		List<ChildDataFromAddressDTO> ListDTO = new ArrayList<ChildDataFromAddressDTO>();
 		

@@ -17,6 +17,7 @@ import com.openclassrooms.SafetyNetAlerts.model.ChildDataFromAddressDTO;
 import com.openclassrooms.SafetyNetAlerts.model.Person;
 import com.openclassrooms.SafetyNetAlerts.model.PersonDataFromLastNameDTO;
 import com.openclassrooms.SafetyNetAlerts.service.PersonService;
+import com.openclassrooms.SafetyNetAlerts.util.MedicalRecordNotFoundException;
 import com.openclassrooms.SafetyNetAlerts.util.PersonAlreadyExistsException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,14 +36,17 @@ public class PersonController {
 		// code here
     }
 
-	
+	/**
+	 * <p>Will return an HTTP Response containing a List of Person Objects</p>
+	 * @return an HTTP Response containing a List of Person Objects, with status 200; an empty HTTP Response with status 500 if an error occurred
+	 */
 	@GetMapping("/person")
 	public ResponseEntity<List<Person>> getPersons() {
 		ResponseEntity<List<Person>> Response = null;
 		
 		try {
 			Response = new ResponseEntity<>(service.getPersons(), HttpStatus.OK);
-			log.info("[POST] /person - " + String.valueOf(Response.getStatusCode()));
+			log.info("[GET] /person - " + String.valueOf(Response.getStatusCode()));
 		} catch (Exception e) {
 			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 			log.error("[GET] /person - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
@@ -51,6 +55,11 @@ public class PersonController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will attempt to add a Person into the Application, and return an HTTP Status signifying its success or failure</p>
+	 * @param person the Person Object to add
+	 * @return an HTTP Response with: Status 200 if everything went well; Status 400 if the person already exists within the Application or isn't valid (not every field is filled); Status 500 if another problem arose; 
+	 */
 	@PostMapping("/person")
 	public ResponseEntity<HttpStatus> addPerson(@RequestBody Person person) {
 		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
@@ -77,6 +86,11 @@ public class PersonController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will attempt to modify the attributes (address, phone, etc) of a Person registered in the Application</p>
+	 * @param person the Person Object to modify
+	 * @return an HTTP Response with: Status 200 if everything went well; Status 400 if the person isn't valid (not every field is filled); Status 500 if another problem arose;
+	 */
 	@PutMapping("/person")
 	public ResponseEntity<HttpStatus> modifyPerson(@RequestBody Person person) {
 		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
@@ -100,6 +114,12 @@ public class PersonController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will attempt to delete a person registered in the Application</p>
+	 * @param firstName of the Person to delete
+	 * @param lastName of the Person to delete
+	 * @return an HTTP Response with: Status 200 if everything went well; Status 500 if an error occurred during the deletion process;
+	 */
 	@DeleteMapping("/person")
 	public ResponseEntity<HttpStatus> deletePerson(@RequestParam String firstName, @RequestParam String lastName) {
 		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
@@ -118,6 +138,11 @@ public class PersonController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will retrieve every Child at a given address</p>
+	 * @param address the address to look for
+	 * @return an HTTP Response containing a list of Child DTOs if successful; an empty HTTP Response with status 500 if at any point, a medical record is not found
+	 */
 	@GetMapping("/childAlert")
 	public ResponseEntity<List<ChildDataFromAddressDTO>> getChildrenFromAddress(@RequestParam String address) {
 		ResponseEntity<List<ChildDataFromAddressDTO>> Response = null;
@@ -125,6 +150,9 @@ public class PersonController {
 		try {
 			Response = new ResponseEntity<>(service.getChildrenFromAddress(address), HttpStatus.OK);
 			log.info("[GET] /childAlert - " + String.valueOf(Response.getStatusCode()));
+		} catch (MedicalRecordNotFoundException e) {
+			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("[GET] /childAlert - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
 		} catch (Exception e) {
 			Response = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 			log.error("[GET] /childAlert - " + String.valueOf(Response.getStatusCode()) + " ("+ e.toString() + ")");
@@ -133,6 +161,11 @@ public class PersonController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will retrieve the phone numbers of every Person covered by a specific FireStation</p>
+	 * @param firestation number of the Station to check for
+	 * @return an HTTP Response containing the list of Phone numbers if successful; an empty HTTP Response with status 500 if an error occurred
+	 */
 	@GetMapping("/phoneAlert")
 	public ResponseEntity<List<String>> getPhonesFromStationNumber(@RequestParam String firestation) {
 		ResponseEntity<List<String>> Response = null;
@@ -148,6 +181,11 @@ public class PersonController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will retrieve information related to Person(s) with a specific last name</p>
+	 * @param lastName of the Person(s) to find
+	 * @return an HTTP Response containing the list Person DTOs if successful; an empty HTTP Response with status 500 if an error occurred
+	 */
 	@GetMapping("/personInfo")
 	public ResponseEntity<List<PersonDataFromLastNameDTO>> getPersonInfo(@RequestParam String lastName) {
 		ResponseEntity<List<PersonDataFromLastNameDTO>> Response = null;
@@ -163,6 +201,11 @@ public class PersonController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will retrieve the email addresses of every Person living in a specific city</p>
+	 * @param city the name of the City to parse from
+	 * @return an HTTP Response containing a List of email addresses if successful; an empty HTTP Response with status 500 if an error occurred
+	 */
 	@GetMapping("/communityEmail")
 	public ResponseEntity<List<String>> getCommunityEmail(@RequestParam String city) {
 		ResponseEntity<List<String>> Response = null;

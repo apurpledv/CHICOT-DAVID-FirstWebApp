@@ -22,12 +22,20 @@ import com.openclassrooms.SafetyNetAlerts.util.FireStationAlreadyExistsException
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * FireStationController is an entity that handles every URL/Endpoint linked to Fire Stations (adding, modifying, deleting, ...)
+ */
 @Slf4j
 @Controller
 public class FireStationController {
 	@Autowired
 	FireStationService service;
 	
+	/**
+	 * <p>Will attempt to add a FireStation into the Application, and return an HTTP Status signifying its success or failure</p>
+	 * @param station the FireStation Object to add
+	 * @return an HTTP Response with: Status 200 if everything went well; Status 400 if the station already exists within the Application or isn't valid (not every field is filled); Status 500 if another problem arose; 
+	 */
 	@PostMapping("/firestation")
 	public ResponseEntity<HttpStatus> addFireStation(@RequestBody FireStation station) {
 		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
@@ -54,6 +62,11 @@ public class FireStationController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will attempt to modify the attribute (station) of a FireStation registered in the Application</p>
+	 * @param station the FireStation Object to modify
+	 * @return an HTTP Response with: Status 200 if everything went well; Status 400 if the station isn't valid (not every field is filled); Status 500 if another problem arose;
+	 */
 	@PutMapping("/firestation")
 	public ResponseEntity<HttpStatus> modifyFireStation(@RequestBody FireStation station) {
 		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
@@ -77,6 +90,12 @@ public class FireStationController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will attempt to delete a station registered in the Application</p>
+	 * @param address of the FireStation to delete
+	 * @param station id number of the FireStation to delete
+	 * @return an HTTP Response with: Status 200 if everything went well; Status 500 if an error occurred during the deletion process;
+	 */
 	@DeleteMapping("/firestation")
 	public ResponseEntity<HttpStatus> deleteFireStation(@RequestParam String address, @RequestParam String station) {
 		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
@@ -95,6 +114,11 @@ public class FireStationController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will retrieve information about the people covered by a specific station (id'd by its station number)</p>
+	 * @param stationNumber of the station to parse from
+	 * @return an HTTP Response containing a DTO about the people covered by the station (how many adults, children, and who they are exactly) if successful; an empty HTTP Response with status 500 if at any point, a medical record is not found
+	 */
 	@GetMapping("/firestation")
 	public ResponseEntity<PersonsDataFromStationDTO> getPersonDTOFromStationNumber(@RequestParam String stationNumber) {
 		ResponseEntity<PersonsDataFromStationDTO> Response = null;
@@ -110,6 +134,11 @@ public class FireStationController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will retrieve information about the people living at a certain address (ie: which station covers them, their medical records, their age...)</p>
+	 * @param address to parse from
+	 * @return an HTTP Response containing a List of DTOs, each containing [lastName, phone, age, stationNumber, medication, allergies] with status 200 if successful; an empty HTTP Response with status 500 if an error occurred (ie: a Person doesn't have a bound MedicalRecord)
+	 */
 	@GetMapping("/fire")
 	public ResponseEntity<List<PersonDataFromAddressDTO>> getPersonDTOFromAddress(@RequestParam String address) {
 		ResponseEntity<List<PersonDataFromAddressDTO>> Response = null;
@@ -125,6 +154,11 @@ public class FireStationController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will retrieve information about a list of household (ie: people living at one address), who are covered by different stations</p>
+	 * @param stations a List of station numbers to parse from
+	 * @return an HTTP Response containing a List of DTOs, each containing [address, occupants] with status 200 if successful; an empty HTTP Response with status 500 if an error occurred
+	 */
 	@GetMapping("/flood/stations")
 	public ResponseEntity<List<HouseholdFromStationsDTO>> getHouseholdDTOFromStations(@RequestParam List<String> stations) {
 		ResponseEntity<List<HouseholdFromStationsDTO>> Response = null;

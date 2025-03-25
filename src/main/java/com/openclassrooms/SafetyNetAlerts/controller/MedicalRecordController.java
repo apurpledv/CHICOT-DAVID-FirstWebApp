@@ -19,12 +19,19 @@ import com.openclassrooms.SafetyNetAlerts.util.MedicalRecordAlreadyExistsExcepti
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * MedicalRecordController is an entity that handles every URL/Endpoint linked to Medical Records (adding, modifying, deleting, ...)
+ */
 @Slf4j
 @Controller
 public class MedicalRecordController {
 	@Autowired
 	MedicalRecordService service;
 	
+	/**
+	 * <p>Will return an HTTP Response containing a List of MedicalRecord Objects</p>
+	 * @return an HTTP Response containing a List of MedicalRecord Objects, with status 200; an empty HTTP Response with status 500 if an error occurred
+	 */
 	@GetMapping("/medicalRecord")
 	public ResponseEntity<List<MedicalRecord>> getMedicalRecords() {
 		ResponseEntity<List<MedicalRecord>> Response = null;
@@ -40,6 +47,11 @@ public class MedicalRecordController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will attempt to add a MedicalRecord into the Application, and return an HTTP Status signifying its success or failure</p>
+	 * @param record the MedicalRecord Object to add
+	 * @return an HTTP Response with: Status 200 if everything went well; Status 400 if the record already exists within the Application or isn't valid (not every field is filled); Status 500 if another problem arose; 
+	 */
 	@PostMapping("/medicalRecord")
 	public ResponseEntity<HttpStatus> addMedicalRecord(@RequestBody MedicalRecord record) {
 		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
@@ -66,6 +78,11 @@ public class MedicalRecordController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will attempt to modify the attributes (birthdate, medication and allergies) of a MedicalRecord registered in the Application</p>
+	 * @param record the MedicalRecord Object to modify
+	 * @return an HTTP Response with: Status 200 if everything went well; Status 400 if the record isn't valid (not every field is filled); Status 500 if another problem arose;
+	 */
 	@PutMapping("/medicalRecord")
 	public ResponseEntity<HttpStatus> modifyMedicalRecord(@RequestBody MedicalRecord record) {
 		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
@@ -89,6 +106,12 @@ public class MedicalRecordController {
 		return Response;
 	}
 	
+	/**
+	 * <p>Will attempt to delete a record registered in the Application</p>
+	 * @param recordFirstName of the person's MedicalRecord to delete
+	 * @param recordLastName of the person's MedicalRecord to delete
+	 * @return an HTTP Response with: Status 200 if everything went well; Status 500 if an error occurred during the deletion process;
+	 */
 	@DeleteMapping("/medicalRecord")
 	public ResponseEntity<HttpStatus> deleteMedicalRecord(@RequestParam String recordFirstName, @RequestParam String recordLastName) {
 		ResponseEntity<HttpStatus> Response = new ResponseEntity<>(HttpStatus.OK);
